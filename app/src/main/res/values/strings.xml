@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">PrototypeBug</string>
+    <string name="sensitivity">sensitivity</string>
+    <string name="optionbutton">optionbutton</string>
+    <string name="block_murderer">block murderer</string>
+    <string name="closebutton">closebutton</string>
+    <string name="tap_to_start">Tap to Start</string>
+    <string name="tap_to_restart">Tap To Restart</string>
+</resources>
