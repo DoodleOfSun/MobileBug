@@ -32,7 +32,7 @@ import androidx.transition.Visibility
 import kotlin.math.atan2
 
 
-// TODO 보스전, 게임 종료 로직 필요
+// 게임 일시정지 로직 필요
 
 class MainActivity : AppCompatActivity(), SensorEventListener {
 
@@ -70,6 +70,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     private var deltaTime = 0f   // 초 단위
     private var secTime = 0f;
     private var monsterSpawnTimeDelay = 3f
+    private var isPaused : Boolean = false
 
     // 텍스트 요소 멤버변수
     lateinit var titleText : TextView
@@ -125,6 +126,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         val settingsButton = findViewById<ImageButton>(R.id.btn_settings)
 
         settingsButton.setOnClickListener {
+            isPaused = true
             val settingsXML = layoutInflater.inflate(R.layout.settings, null)
             val btnClose = settingsXML.findViewById<ImageButton>(R.id.btnSettingClose)
             val seekBar = settingsXML.findViewById<SeekBar>(R.id.sensitivityBar)
@@ -148,6 +150,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                 val prefs = getSharedPreferences("game_settings", MODE_PRIVATE)
                 prefs.edit().putFloat("sensitivity", sensitivity).apply()
 
+                isPaused = false
                 dialog.dismiss()
             }
 
@@ -296,7 +299,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                 lastFrameTimeNanos = frameTimeNanos
             }
 
-            if (!isBlockMurdererStarted) {
+            if (!isBlockMurdererStarted || isPaused) {
                 secTime = 0f
             } else {
                 secTime += deltaTime
@@ -351,13 +354,15 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                     }
                 }
 
+
+
                 // 루프가 끝난 뒤에 한꺼번에 제거
                 toRemove.forEach { enemy ->
                     enemySpawner.removeEnemy(enemy)
                 }
 
 
-
+                rewardJewels.update(playerInfo, deltaTime)
 
             }
 
