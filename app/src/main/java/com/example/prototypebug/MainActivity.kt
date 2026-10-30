@@ -418,4 +418,8 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         val hpPercent = (playerInfo.health.toFloat() / playerInfo.maxHealth * 100).toInt()
         playerHPBar.progress = hpPercent.coerceIn(0, 100)
     }
+
+    public fun setPause(data : Boolean){
+        isPaused = data
+    }
 }

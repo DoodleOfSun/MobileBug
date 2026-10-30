@@ -1,5 +1,6 @@
 package com.example.prototypebug
 
+import android.content.Context
 import android.view.View
 import kotlin.math.sqrt
 
@@ -66,8 +67,16 @@ class PlayerInfo {
         }
     }
 
-    fun playerGetExp(exp : Float){
+    fun playerGetExp(exp : Float, cont : Context){
         playerExp += exp
+        if(playerExp >= 1){
+            playerExp = 0f
 
+            if(cont is MainActivity){
+                cont.setPause(true)
+
+                // 렙업했으니 강화 선택
+            }
+        }
     }
 }
