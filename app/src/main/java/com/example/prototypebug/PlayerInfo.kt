@@ -13,6 +13,8 @@ class PlayerInfo {
 
     lateinit var playerSprite: View
 
+    var playerExp : Float = 0f
+
     fun playerReset(){
         x = 0f
         y = 0f
@@ -64,4 +66,8 @@ class PlayerInfo {
         }
     }
 
+    fun playerGetExp(exp : Float){
+        playerExp += exp
+
+    }
 }

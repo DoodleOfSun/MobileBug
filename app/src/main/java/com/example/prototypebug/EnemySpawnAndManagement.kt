@@ -56,6 +56,10 @@ class EnemySpawnAndManagement {
     }
 
     fun updateAll(player: PlayerInfo, deltaTime: Float) {
+
+        // 플레이어를 추적
+        // ====================================================================================
+
         enemies.forEach { it.update(player.getCenterX(), player.getCenterY()) }
 
         val slop = 0.5f
@@ -111,6 +115,13 @@ class EnemySpawnAndManagement {
             }
         }
 
+        // ====================================================================================
+
+
+
+        // 충돌 처리
+        // ====================================================================================
+
         var isTouchingAnyEnemy = false
         var damageDealer: Enemy? = null
         var minRemain = Float.MAX_VALUE
@@ -148,6 +159,7 @@ class EnemySpawnAndManagement {
             playerAndEnemyCollisionSecTimer = monsterDamageDelay
         }
 
+        // ====================================================================================
     }
 
     fun resetAllEnemies(){

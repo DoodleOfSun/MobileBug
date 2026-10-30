@@ -62,6 +62,9 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     private lateinit var enemySpawner : EnemySpawnAndManagement
     private lateinit var enemy : Enemy
 
+    // 경험치 보석
+    private lateinit var rewardJewels : RewardManagement
+
     // 시간 흐름
     private var lastFrameTimeNanos = 0L
     private var deltaTime = 0f   // 초 단위
@@ -239,6 +242,10 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         enemySpawner.container = findViewById<ViewGroup>(R.id.mainContainer)
         enemySpawner.context = this
 
+        rewardJewels = RewardManagement()
+        rewardJewels.container = findViewById<ViewGroup>(R.id.mainContainer)
+        rewardJewels.context = this
+
         @SuppressLint("ClickableViewAccessibility")
         container.setOnTouchListener { _, event ->
             if (event.action == MotionEvent.ACTION_DOWN) {
@@ -326,13 +333,20 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                     playerInfo.playerSprite.width.toFloat(),  // squareSizePx 대신 실제 크기
                     deltaTime
                 )
+
+
                 val toRemove = mutableListOf<Enemy>()
 
                 enemySpawner.enemies.forEach { enemy ->
                     if (playerNormalAttack.checkCollision(enemy.getCenterX(), enemy.getCenterY(), enemy.radius)) {
                         enemy.takeDamage(playerNormalAttack.attackPower)
+
+                        // 적 사망 체크
                         if (enemy.health <= 0f) {
+
+                            rewardJewels.spawn(enemy.getCenterX(), enemy.getCenterY())
                             toRemove.add(enemy)
+
                         }
                     }
                 }
