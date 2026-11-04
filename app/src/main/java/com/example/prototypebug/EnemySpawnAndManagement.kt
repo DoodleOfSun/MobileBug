@@ -37,6 +37,36 @@ class EnemySpawnAndManagement {
         enemies.add(enemy)
     }
 
+    fun spawnBoss() {
+        val width = container.width.toFloat()
+        val height = container.height.toFloat()
+        if (width == 0f || height == 0f) return
+
+        val centerX = width / 2f
+        val centerY = height / 2f
+        val spawnRadius = sqrt(centerX * centerX + centerY * centerY) + 150f
+        val randomAngle = Random.nextDouble(0.0, 2.0 * Math.PI)
+
+        val spawnX = centerX + (spawnRadius * cos(randomAngle)).toFloat()
+        val spawnY = centerY + (spawnRadius * sin(randomAngle)).toFloat()
+
+        val enemyView = ImageView(context)
+        val bossSizePx = 120
+
+        enemyView.layoutParams = ConstraintLayout.LayoutParams(bossSizePx, bossSizePx)
+        enemyView.setImageResource(R.drawable.enemycircle)
+        container.addView(enemyView)
+
+        val boss = Boss()
+        boss.radius = bossSizePx / 2f
+        boss.x = spawnX
+        boss.y = spawnY
+        boss.enemySprite = enemyView
+
+        enemies.add(boss)
+        Log.d("GameDebug", "보스 스폰!")
+    }
+
     fun spawnFromEdge() {
         val width = container.width.toFloat()
         val height = container.height.toFloat()

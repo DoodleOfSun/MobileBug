@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="550dp"
+    android:layout_height="330dp"
+    android:background="#FFF5F5FA"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="691dp"
+        android:layout_height="219dp"
+        android:layout_margin="16dp"
+        android:gravity="center"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.453">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/text_choose1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="32dp"
+                android:text="강화 1"
+                android:textSize="20sp" />
+
+            <ImageButton
+                android:id="@+id/btn_choose1"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:background="@android:color/transparent"
+                android:contentDescription="선택1"
+                android:scaleType="fitCenter"
+                android:src="@drawable/xmark512" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/text_choose2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="32dp"
+                android:text="강화 2"
+                android:textSize="20sp" />
+
+            <ImageButton
+                android:id="@+id/btn_choose2"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:background="@android:color/transparent"
+                android:contentDescription="선택2"
+                android:scaleType="fitCenter"
+                android:src="@drawable/xmark512" />
+        </LinearLayout>
+
+        <!-- 3번 -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/text_choose3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="32dp"
+                android:text="강화 3"
+                android:textSize="20sp" />
+
+            <ImageButton
+                android:id="@+id/btn_choose3"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:background="@android:color/transparent"
+                android:contentDescription="선택3"
+                android:scaleType="fitCenter"
+                android:src="@drawable/xmark512" />
+        </LinearLayout>
+
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

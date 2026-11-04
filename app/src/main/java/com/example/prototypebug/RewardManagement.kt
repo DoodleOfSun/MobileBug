@@ -62,7 +62,7 @@ class RewardManagement {
         }
 
         toRemove.forEach { reward ->
-            player.playerGetExp(reward.exp)
+            player.playerGetExp(reward.exp, context)
             destroy(reward)
 
         }

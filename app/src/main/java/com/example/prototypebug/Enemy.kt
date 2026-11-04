@@ -3,11 +3,11 @@ package com.example.prototypebug
 import android.view.View
 import kotlin.math.sqrt
 
-class Enemy {
+open class Enemy {
     var x = 0f
     var y = 0f
     var moveSpeed = 2.5f
-    val radius = 30f
+    var radius = 30f
 
     var attackPower = 1
     var health : Float = 10f

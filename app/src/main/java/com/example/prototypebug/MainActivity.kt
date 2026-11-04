@@ -32,7 +32,7 @@ import androidx.transition.Visibility
 import kotlin.math.atan2
 
 
-// 게임 일시정지 로직 필요
+// TODO : 5분 타이머, 보스가 주기적으로 나왔으면 좋겠다. 보스의 이동속도는 매우 느리다.
 
 class MainActivity : AppCompatActivity(), SensorEventListener {
 
@@ -71,6 +71,10 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     private var secTime = 0f;
     private var monsterSpawnTimeDelay = 3f
     private var isPaused : Boolean = false
+
+    private var gameTime = 0f
+    private var waveCount = 0
+    private val winTime = 300f          // 5분
 
     // 텍스트 요소 멤버변수
     lateinit var titleText : TextView
@@ -155,6 +159,17 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
             }
 
             dialog.show()
+
+            // 작아졌다가 쑥 커지는 연출
+            val content = dialog.window?.decorView ?: return@setOnClickListener
+            content.scaleX = 0.3f
+            content.scaleY = 0.3f
+            content.animate()
+                .scaleX(1f)
+                .scaleY(1f)
+                .setDuration(250)
+                .setInterpolator(android.view.animation.OvershootInterpolator())
+                .start()
         }
 
         WindowCompat.setDecorFitsSystemWindows(window, false)
@@ -305,13 +320,22 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                 secTime += deltaTime
 
                 // 이 밑에 Update 필요한 구문을 작성
-                // 몬스터 소환 로직
+
+
+                // 기존 몬스터 스폰 로직 수정
                 if (secTime >= monsterSpawnTimeDelay) {
                     Log.d("GameDebug", "3초가 지났어요")
+
+                    waveCount++
 
                     repeat(9) {
                         enemySpawner.spawnFromEdge()
                         totalEnemySpawn++
+                    }
+
+                    // 10웨이브마다 보스 함께 스폰
+                    if (waveCount % 10 == 0) {
+                        enemySpawner.spawnBoss()
                     }
 
                     secTime -= monsterSpawnTimeDelay
@@ -323,6 +347,17 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
                 // HP 바 업데이트
                 updateHPBarValue()
+
+                // 플레이어 승리 체크
+                gameTime += deltaTime
+
+                // 5분 경과 → 승리
+                if (gameTime >= winTime) {
+                    winGame()
+                }
+
+
+
 
                 // 플레이어 사망 체크
                 if(playerInfo.checkPlayerDied()){
@@ -355,7 +390,6 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                 }
 
 
-
                 // 루프가 끝난 뒤에 한꺼번에 제거
                 toRemove.forEach { enemy ->
                     enemySpawner.removeEnemy(enemy)
@@ -380,7 +414,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
     }
 
-    private fun dpToPx(dp: Float): Int {
+    public fun dpToPx(dp: Float): Int {
         val density = resources.displayMetrics.density
         return (dp * density).toInt()
     }
@@ -392,6 +426,9 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
         playerHPBar.progress = 100
         playerHPBar.visibility = View.INVISIBLE
+
+        gameTime = 0f
+        waveCount = 0
 
         container.post {
             playerInfo.x = (container.width - squareSizePx) / 2f
@@ -421,5 +458,14 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
     public fun setPause(data : Boolean){
         isPaused = data
+    }
+
+    private fun winGame() {
+        isBlockMurdererStarted = false
+        diedText.text = "승리!"
+        diedText.visibility = View.VISIBLE
+        playerHPBar.visibility = View.INVISIBLE
+        playerNormalAttack.sprite.visibility = View.INVISIBLE
+        Log.d("GameDebug", "5분 생존 승리!")
     }
 }
