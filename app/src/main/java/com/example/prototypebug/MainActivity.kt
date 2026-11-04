@@ -86,6 +86,11 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
     private var totalEnemySpawn : Int = 0
 
+    // 점수
+    private var score : Float = 0f
+    private var enemyKillCount : Int = 0
+    private var bossKillCount : Int = 0
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -430,6 +435,10 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         gameTime = 0f
         waveCount = 0
 
+        score = 0f
+        enemyKillCount = 0
+        bossKillCount = 0
+
         container.post {
             playerInfo.x = (container.width - squareSizePx) / 2f
             playerInfo.y = (container.height - squareSizePx) / 2f
@@ -462,10 +471,16 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
     private fun winGame() {
         isBlockMurdererStarted = false
-        diedText.text = "승리!"
+
+        // 점수 계산
+        score = winTime * 30 + enemyKillCount * 100 + bossKillCount * 3500
+
+        diedText.text = "승리!\n점수: $score"
         diedText.visibility = View.VISIBLE
+
         playerHPBar.visibility = View.INVISIBLE
         playerNormalAttack.sprite.visibility = View.INVISIBLE
-        Log.d("GameDebug", "5분 생존 승리!")
+
+        Log.d("GameDebug", "5분 생존 승리! 점수: $score")
     }
 }
