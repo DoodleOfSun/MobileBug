@@ -1,0 +1,16 @@
+package com.example.prototypebug
+
+import android.util.Log
+
+class BoomerangWeapon(override val type: WeaponType) : Weapon {
+    override var level = 1
+    private var cooldown = 0f
+    override fun update(deltaTime: Float, player: PlayerInfo, enemies: List<Enemy>) {
+        cooldown -= deltaTime
+        if (cooldown <= 0f) {
+            cooldown = 1.5f / level
+            Log.d("Weapon", "부메랑 발사 Lv.$level")
+        }
+    }
+    override fun onLevelUp() {}
+}

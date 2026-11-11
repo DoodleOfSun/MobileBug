@@ -45,7 +45,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     private lateinit var playerInfo: PlayerInfo
 
     // 무기
-    private lateinit var weaponManager : WeaponManager
+    public lateinit var weaponManager : WeaponManager
 
     // 속도 (관성 느낌을 주기 위함)
     private var velX = 0f
@@ -368,7 +368,8 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                 }
 
 
-
+                // gameUpdate() 안, 적 업데이트 근처
+                weaponManager.updateAll(deltaTime, playerInfo, enemySpawner.enemies)
 
                 // 플레이어 사망 체크
                 if(playerInfo.checkPlayerDied()){
@@ -522,20 +523,19 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         text3.text = choices[2].name
         btn3.setImageResource(choices[2].iconRes)
 
-        // 클릭 처리 (일단 로그만)
+        // 클릭 처리
         btn1.setOnClickListener {
-            Log.d("Weapon", "선택: ${choices[0].name}")
-            // TODO: weaponManager.addOrLevelUp(choices[0])
+            weaponManager.addOrLevelUp(choices[0])
             isPaused = false
             dialog.dismiss()
         }
         btn2.setOnClickListener {
-            Log.d("Weapon", "선택: ${choices[1].name}")
+            weaponManager.addOrLevelUp(choices[1])
             isPaused = false
             dialog.dismiss()
         }
         btn3.setOnClickListener {
-            Log.d("Weapon", "선택: ${choices[2].name}")
+            weaponManager.addOrLevelUp(choices[2])
             isPaused = false
             dialog.dismiss()
         }
