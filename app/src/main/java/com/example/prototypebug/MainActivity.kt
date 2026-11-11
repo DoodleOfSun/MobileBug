@@ -44,6 +44,9 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     // 플레이어
     private lateinit var playerInfo: PlayerInfo
 
+    // 무기
+    private lateinit var weaponManager : WeaponManager
+
     // 속도 (관성 느낌을 주기 위함)
     private var velX = 0f
     private var velY = 0f
@@ -121,6 +124,9 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
         sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
+
+        // 무기 매니저 초기화
+        weaponManager = WeaponManager()
 
         initEntireSystem()
 
@@ -482,5 +488,58 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         playerNormalAttack.sprite.visibility = View.INVISIBLE
 
         Log.d("GameDebug", "5분 생존 승리! 점수: $score")
+    }
+
+    // MainActivity 안에 (레벨업 발생 시 호출할 함수)
+    private fun showLevelUpDialog() {
+        isPaused = true
+
+        val levelUpXML = layoutInflater.inflate(R.layout.level_up_settings, null)  // 레벨업 레이아웃 이름에 맞게
+        val dialog = Dialog(this)
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setContentView(levelUpXML)
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.setCancelable(false)
+
+        // 3개 랜덤 뽑기
+        val choices = weaponManager.getRandomChoices(3)
+
+        // UI 요소 찾기 (레이아웃 ID에 맞게 수정)
+        val text1 = levelUpXML.findViewById<TextView>(R.id.text_choose1)
+        val btn1  = levelUpXML.findViewById<ImageButton>(R.id.btn_choose1)
+        val text2 = levelUpXML.findViewById<TextView>(R.id.text_choose2)
+        val btn2  = levelUpXML.findViewById<ImageButton>(R.id.btn_choose2)
+        val text3 = levelUpXML.findViewById<TextView>(R.id.text_choose3)
+        val btn3  = levelUpXML.findViewById<ImageButton>(R.id.btn_choose3)
+
+        // 데이터 바인딩
+        text1.text = choices[0].name
+        btn1.setImageResource(choices[0].iconRes)
+
+        text2.text = choices[1].name
+        btn2.setImageResource(choices[1].iconRes)
+
+        text3.text = choices[2].name
+        btn3.setImageResource(choices[2].iconRes)
+
+        // 클릭 처리 (일단 로그만)
+        btn1.setOnClickListener {
+            Log.d("Weapon", "선택: ${choices[0].name}")
+            // TODO: weaponManager.addOrLevelUp(choices[0])
+            isPaused = false
+            dialog.dismiss()
+        }
+        btn2.setOnClickListener {
+            Log.d("Weapon", "선택: ${choices[1].name}")
+            isPaused = false
+            dialog.dismiss()
+        }
+        btn3.setOnClickListener {
+            Log.d("Weapon", "선택: ${choices[2].name}")
+            isPaused = false
+            dialog.dismiss()
+        }
+
+        dialog.show()
     }
 }
