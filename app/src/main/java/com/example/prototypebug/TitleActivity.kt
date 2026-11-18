@@ -12,11 +12,13 @@ import android.hardware.SensorManager
 import android.os.Bundle
 import android.util.Log
 import android.view.MotionEvent
+import android.view.Surface
 import android.view.View
 import android.view.Window
 import android.widget.ImageButton
 import android.widget.SeekBar
 import androidx.appcompat.app.AppCompatActivity
+import kotlin.math.atan2
 
 class TitleActivity : AppCompatActivity(), SensorEventListener {
 
@@ -76,6 +78,10 @@ class TitleActivity : AppCompatActivity(), SensorEventListener {
                 dialog.dismiss()
             }
 
+            dialog.setOnDismissListener {
+                isPaused = false
+            }
+
             dialog.show()
         }
     }
@@ -94,19 +100,26 @@ class TitleActivity : AppCompatActivity(), SensorEventListener {
 
     override fun onSensorChanged(event: SensorEvent?) {
         if (isPaused) return
-
         if (event == null || event.sensor.type != Sensor.TYPE_ACCELEROMETER) return
 
-        val tiltX = event.values[1]
-        val tiltY = -event.values[0]
+        @Suppress("DEPRECATION")
+        val rotation = windowManager.defaultDisplay.rotation
+        val rawX = event.values[0]
+        val rawY = event.values[1]
 
-        velX += tiltX * sensitivity * 0.05f
-        velY += tiltY * sensitivity * 0.05f
+        val (mappedX, mappedY) = when (rotation) {
+            Surface.ROTATION_90 -> rawY to -rawX
+            Surface.ROTATION_270 -> -rawY to rawX
+            else -> rawX to rawY
+        }
+
+        velX += mappedX * sensitivity * 0.05f
+        velY += -mappedY * sensitivity * 0.05f
         velX *= damping
         velY *= damping
 
         playerSprite.x += velX
-        playerSprite.y -= velY
+        playerSprite.y += velY
 
         val container = findViewById<View>(R.id.mainContainer)
         val maxX = (container.width - playerSprite.width).coerceAtLeast(0).toFloat()
@@ -114,6 +127,11 @@ class TitleActivity : AppCompatActivity(), SensorEventListener {
 
         playerSprite.x = playerSprite.x.coerceIn(0f, maxX)
         playerSprite.y = playerSprite.y.coerceIn(0f, maxY)
+
+        val speedSq = velX * velX + velY * velY
+        if (speedSq > 0.01f) {
+            playerSprite.rotation = Math.toDegrees(atan2(velY.toDouble(), velX.toDouble())).toFloat()
+        }
     }
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
