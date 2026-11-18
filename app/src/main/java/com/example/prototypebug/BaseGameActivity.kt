@@ -296,8 +296,12 @@ abstract class BaseGameActivity : AppCompatActivity(), SensorEventListener {
 
     protected fun updateHPBarValue() {
         if (!isBlockMurdererStarted) return
-        val percent = (playerInfo.health.toFloat() / playerInfo.maxHealth * 100).toInt()
-        playerHPBar.progress = percent.coerceIn(0, 100)
+
+        val current = playerInfo.health.toFloat()
+        val max = playerInfo.maxHealth.toFloat()
+        val percent = ((current / max) * 100f).toInt().coerceIn(0, 100)
+
+        playerHPBar.progress = percent
     }
     fun setPause(data: Boolean) { isPaused = data }
 
