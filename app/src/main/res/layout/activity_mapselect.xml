@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <HorizontalScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#FFFFFF"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:padding="16dp">
+
+            <!-- 맵 1 -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:layout_marginEnd="32dp">
+
+                <ImageButton
+                    android:id="@+id/btn_map1"
+                    android:layout_width="220dp"
+                    android:layout_height="140dp"
+                    android:src="@drawable/panel_grey_dark"
+                    android:scaleType="centerCrop"
+                    android:background="?attr/selectableItemBackground"
+                    android:contentDescription="맵 1"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="맵1"
+                    android:textSize="18sp"
+                    android:layout_marginTop="8dp" />
+            </LinearLayout>
+
+            <!-- 맵 2 -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:layout_marginEnd="32dp">
+
+                <ImageButton
+                    android:id="@+id/btn_map2"
+                    android:layout_width="220dp"
+                    android:layout_height="140dp"
+                    android:src="@drawable/panel_grey_dark"
+                    android:scaleType="centerCrop"
+                    android:background="?attr/selectableItemBackground"
+                    android:contentDescription="맵 2"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="맵2"
+                    android:textSize="18sp"
+                    android:layout_marginTop="8dp" />
+            </LinearLayout>
+
+            <!-- 맵 3 추가 가능 -->
+
+        </LinearLayout>
+    </HorizontalScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

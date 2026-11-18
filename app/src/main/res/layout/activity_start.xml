@@ -33,20 +33,6 @@
 
 
     <TextView
-        android:id="@+id/playerDeadText"
-        android:layout_width="414dp"
-        android:layout_height="80dp"
-        android:layout_marginTop="148dp"
-        android:fontFamily="@font/youre_gone"
-        android:text="@string/tap_to_restart"
-        android:textSize="42dp"
-        android:gravity="center"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
         android:id="@+id/tapToStartText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -71,35 +57,6 @@
         android:src="@drawable/gear"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-
-    <ProgressBar
-        android:id="@+id/progressBar_playerHP"
-        style="?android:attr/progressBarStyleHorizontal"
-        android:layout_width="70dp"
-        android:layout_height="47dp"
-        android:max="100"
-        android:progress="100"
-        android:progressBackgroundTint="#333333"
-        android:progressTint="#FB693B"
-        android:scaleY="3"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.499"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.378" />
-
-    <ImageView
-        android:id="@+id/imageView_playerNormalAttack"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.499"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.692"
-        app:srcCompat="@drawable/playernormalattack" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

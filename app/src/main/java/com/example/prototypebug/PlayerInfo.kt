@@ -8,7 +8,6 @@ import android.view.View
 import android.view.Window
 import android.widget.ImageButton
 import android.widget.TextView
-import kotlin.math.sqrt
 
 class PlayerInfo {
     var x = 0f
@@ -78,7 +77,7 @@ class PlayerInfo {
         if (playerExp >= 1f) {
             playerExp = 0f
 
-            if (cont is MainActivity) {
+            if (cont is Map1Activity) {
                 cont.setPause(true)
 
                 val levelupXML = cont.layoutInflater.inflate(R.layout.level_up_settings, null)

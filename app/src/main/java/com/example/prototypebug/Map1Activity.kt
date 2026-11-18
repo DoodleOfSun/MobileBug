@@ -2,7 +2,7 @@ package com.example.prototypebug
 
 import android.annotation.SuppressLint
 import android.app.Dialog
-import android.content.Context
+import android.content.Intent
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
@@ -28,13 +28,12 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import androidx.transition.Visibility
 import kotlin.math.atan2
 
 
-// TODO : 5분 타이머, 보스가 주기적으로 나왔으면 좋겠다. 보스의 이동속도는 매우 느리다.
 
-class MainActivity : AppCompatActivity(), SensorEventListener {
+
+class Map1Activity : AppCompatActivity(), SensorEventListener {
 
     private lateinit var sensorManager: SensorManager
     private var accelerometer: Sensor? = null
@@ -79,10 +78,6 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     private var waveCount = 0
     private val winTime = 300f          // 5분
 
-    // 텍스트 요소 멤버변수
-    lateinit var titleText : TextView
-    lateinit var tapToStartText : TextView
-    lateinit var diedText : TextView
 
     // 프레임당 호출 내장 콜백
     private lateinit var gameLoop: Choreographer.FrameCallback
@@ -97,11 +92,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        setContentView(R.layout.activity_main)
-        titleText = findViewById<TextView>(R.id.titleText)
-        tapToStartText = findViewById<TextView>(R.id.tapToStartText)
-        diedText = findViewById<TextView>(R.id.playerDeadText)
-        diedText.visibility = View.INVISIBLE
+        setContentView(R.layout.activity_map1)
 
         playerHPBar = findViewById<ProgressBar>(R.id.progressBar_playerHP)
         playerHPBar.visibility = View.INVISIBLE
@@ -205,6 +196,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     }
 
     override fun onSensorChanged(event: SensorEvent?) {
+        if (isPaused || !isBlockMurdererStarted) return
         if (event == null || event.sensor.type != Sensor.TYPE_ACCELEROMETER) return
 
         @Suppress("DEPRECATION")
@@ -242,13 +234,13 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         playerInfo.x += velX
         playerInfo.y += velY
 
-        val maxX = (container.width - squareSizePx).coerceAtLeast(0)
-        val maxY = (container.height - squareSizePx).coerceAtLeast(0)
+        val containerView = findViewById<View>(R.id.mainContainer)
+        val maxX = (containerView.width - playerInfo.playerSprite.width).coerceAtLeast(0).toFloat()
+        val maxY = (containerView.height - playerInfo.playerSprite.height).coerceAtLeast(0).toFloat()
 
-        if (playerInfo.x < 0f) { playerInfo.x = 0f; velX = 0f }
-        if (playerInfo.x > maxX) { playerInfo.x = maxX.toFloat(); velX = 0f }
-        if (playerInfo.y < 0f) { playerInfo.y = 0f; velY = 0f }
-        if (playerInfo.y > maxY) { playerInfo.y = maxY.toFloat(); velY = 0f }
+        playerInfo.x = playerInfo.x.coerceIn(0f, maxX)
+        playerInfo.y = playerInfo.y.coerceIn(0f, maxY)
+
 
         playerInfo.playerSprite.x = playerInfo.x
         playerInfo.playerSprite.y = playerInfo.y
@@ -265,6 +257,11 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
 
     private fun initEntireSystem(){
+
+        isBlockMurdererStarted = true
+        playerHPBar.visibility = View.VISIBLE
+        playerNormalAttack.sprite.visibility = View.VISIBLE
+
         val container = findViewById<View>(R.id.mainContainer)
 
         enemySpawner = EnemySpawnAndManagement()
@@ -275,43 +272,24 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         rewardJewels.container = findViewById<ViewGroup>(R.id.mainContainer)
         rewardJewels.context = this
 
-        @SuppressLint("ClickableViewAccessibility")
-        container.setOnTouchListener { _, event ->
-            if (event.action == MotionEvent.ACTION_DOWN) {
-
-
-                isBlockMurdererStarted = startGame(isBlockMurdererStarted)
-            }
-            true
-        }
-
 
 
         gameUpdate()
     }
 
-    private fun startGame(startBoolData: Boolean): Boolean {
-        diedText.visibility = View.INVISIBLE
 
-        if (!startBoolData) {
-            gameLaunch()
-        }
+    private fun endGame() {
+        score = gameTime * 10 + enemyKillCount * 100 + bossKillCount * 3500
 
-        // 리셋 끝난 뒤에 VISIBLE로 바꾸기
-        playerHPBar.visibility = View.VISIBLE
-        playerNormalAttack.sprite.visibility = View.VISIBLE   // 또는 playerNormalAttack.show()
-
-        return true
-    }
-
-    private fun endGame(){
-        diedText.visibility = View.VISIBLE
-        playerHPBar.visibility = View.INVISIBLE
+        val intent = Intent(this, ResultActivity::class.java)
+        intent.putExtra("isWin", false)
+        intent.putExtra("score", score)
+        intent.putExtra("mapClass", Map1Activity::class.java.name)
+        startActivity(intent)
+        finish()
     }
 
     private fun gameLaunch() {
-        titleText.visibility = View.INVISIBLE
-        tapToStartText.visibility = View.INVISIBLE
         resetAllObjects()
     }
 
@@ -417,14 +395,6 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         Choreographer.getInstance().postFrameCallback(gameLoop)
     }
 
-    private fun returnToMain(){
-        val titleText = findViewById<TextView>(R.id.titleText)
-        val tapToStartText = findViewById<TextView>(R.id.tapToStartText)
-
-        titleText.visibility = View.VISIBLE
-        tapToStartText.visibility = View.VISIBLE
-
-    }
 
     public fun dpToPx(dp: Float): Int {
         val density = resources.displayMetrics.density
@@ -479,67 +449,13 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     private fun winGame() {
         isBlockMurdererStarted = false
 
-        // 점수 계산
         score = winTime * 30 + enemyKillCount * 100 + bossKillCount * 3500
 
-        diedText.text = "승리!\n점수: $score"
-        diedText.visibility = View.VISIBLE
-
-        playerHPBar.visibility = View.INVISIBLE
-        playerNormalAttack.sprite.visibility = View.INVISIBLE
-
-        Log.d("GameDebug", "5분 생존 승리! 점수: $score")
-    }
-
-    // MainActivity 안에 (레벨업 발생 시 호출할 함수)
-    private fun showLevelUpDialog() {
-        isPaused = true
-
-        val levelUpXML = layoutInflater.inflate(R.layout.level_up_settings, null)  // 레벨업 레이아웃 이름에 맞게
-        val dialog = Dialog(this)
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        dialog.setContentView(levelUpXML)
-        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        dialog.setCancelable(false)
-
-        // 3개 랜덤 뽑기
-        val choices = weaponManager.getRandomChoices(3)
-
-        // UI 요소 찾기 (레이아웃 ID에 맞게 수정)
-        val text1 = levelUpXML.findViewById<TextView>(R.id.text_choose1)
-        val btn1  = levelUpXML.findViewById<ImageButton>(R.id.btn_choose1)
-        val text2 = levelUpXML.findViewById<TextView>(R.id.text_choose2)
-        val btn2  = levelUpXML.findViewById<ImageButton>(R.id.btn_choose2)
-        val text3 = levelUpXML.findViewById<TextView>(R.id.text_choose3)
-        val btn3  = levelUpXML.findViewById<ImageButton>(R.id.btn_choose3)
-
-        // 데이터 바인딩
-        text1.text = choices[0].name
-        btn1.setImageResource(choices[0].iconRes)
-
-        text2.text = choices[1].name
-        btn2.setImageResource(choices[1].iconRes)
-
-        text3.text = choices[2].name
-        btn3.setImageResource(choices[2].iconRes)
-
-        // 클릭 처리
-        btn1.setOnClickListener {
-            weaponManager.addOrLevelUp(choices[0])
-            isPaused = false
-            dialog.dismiss()
-        }
-        btn2.setOnClickListener {
-            weaponManager.addOrLevelUp(choices[1])
-            isPaused = false
-            dialog.dismiss()
-        }
-        btn3.setOnClickListener {
-            weaponManager.addOrLevelUp(choices[2])
-            isPaused = false
-            dialog.dismiss()
-        }
-
-        dialog.show()
+        val intent = Intent(this, ResultActivity::class.java)
+        intent.putExtra("isWin", true)
+        intent.putExtra("score", score)
+        intent.putExtra("mapClass", Map1Activity::class.java.name)
+        startActivity(intent)
+        finish()
     }
 }
