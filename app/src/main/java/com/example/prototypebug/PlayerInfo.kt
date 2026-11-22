@@ -9,7 +9,9 @@ import android.view.Window
 import android.widget.ImageButton
 import android.widget.TextView
 
-class PlayerInfo {
+class PlayerInfo internal constructor(private val playSound: (GameSound) -> Unit) {
+    constructor() : this({})
+
     var x = 0f
     var y = 0f
 
@@ -50,6 +52,7 @@ class PlayerInfo {
         }
 
         health -= damageData
+        if (damageData > 0) playSound(GameSound.PLAYER_HIT)
 
         if (health < 0){
             health = 0
@@ -74,8 +77,10 @@ class PlayerInfo {
 
     fun playerGetExp(exp: Float, cont: Context) {
         playerExp += exp
+        if (exp > 0f) playSound(GameSound.EXP_PICKUP)
         if (playerExp >= 1f) {
             playerExp = 0f
+            playSound(GameSound.LEVEL_UP)
 
             if (cont is Map1Activity) {
                 cont.setPause(true)
@@ -112,17 +117,17 @@ class PlayerInfo {
                 btn3.setImageResource(choices[2].iconRes)
 
                 // 선택 처리
-                btn1.setOnClickListener {
+                btn1.setGameClickListener(playSound) {
                     cont.weaponManager.addOrLevelUp(choices[0])
                     cont.setPause(false)
                     dialog.dismiss()
                 }
-                btn2.setOnClickListener {
+                btn2.setGameClickListener(playSound) {
                     cont.weaponManager.addOrLevelUp(choices[1])
                     cont.setPause(false)
                     dialog.dismiss()
                 }
-                btn3.setOnClickListener {
+                btn3.setGameClickListener(playSound) {
                     cont.weaponManager.addOrLevelUp(choices[2])
                     cont.setPause(false)
                     dialog.dismiss()

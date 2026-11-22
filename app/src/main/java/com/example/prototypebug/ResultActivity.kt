@@ -5,9 +5,10 @@ import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
 
-class ResultActivity : AppCompatActivity() {
+class ResultActivity : AudioActivity() {
+
+    private var playedResultSound = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,7 +31,7 @@ class ResultActivity : AppCompatActivity() {
         resultText.text = if (isWin) "nailed it" else "died"
         val mapClassName = intent.getStringExtra("mapClass")
 
-        btnRetry.setOnClickListener {
+        btnRetry.setGameClickListener(::playSound) {
             if (mapClassName != null) {
                 val clazz = Class.forName(mapClassName)
                 startActivity(Intent(this, clazz))
@@ -39,9 +40,18 @@ class ResultActivity : AppCompatActivity() {
         }
 
         // 맵 선택으로
-        btnMapSelect.setOnClickListener {
+        btnMapSelect.setGameClickListener(::playSound) {
             startActivity(Intent(this, MapSelectActivity::class.java))
             finish()
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (!playedResultSound) {
+            playedResultSound = true
+            val isWin = intent.getBooleanExtra("isWin", false)
+            playSound(if (isWin) GameSound.VICTORY else GameSound.DEFEAT)
         }
     }
 }

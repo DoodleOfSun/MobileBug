@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="60dp"
+    android:height="60dp"
+    android:viewportWidth="64"
+    android:viewportHeight="64">
+    <path
+        android:fillColor="@color/map1_enemy_hull"
+        android:strokeColor="@color/map1_enemy_edge"
+        android:strokeWidth="3"
+        android:pathData="M32,2 A30,30 0,1 1,32 62 A30,30 0,1 1,32 2 Z" />
+    <path
+        android:fillColor="@color/map1_enemy_panel"
+        android:pathData="M13,22 L22,13 H42 L51,22 V42 L42,51 H22 L13,42 Z" />
+    <path
+        android:fillColor="@color/map1_enemy_hull"
+        android:pathData="M16,26 H48 L44,38 H20 Z" />
+    <path
+        android:fillColor="@color/map1_enemy_core"
+        android:pathData="M22,29 H42 L40,34 H24 Z" />
+</vector>

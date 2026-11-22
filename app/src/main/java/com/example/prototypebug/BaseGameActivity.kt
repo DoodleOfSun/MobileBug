@@ -17,14 +17,15 @@ import android.view.Window
 import android.widget.ImageButton
 import android.widget.ProgressBar
 import android.widget.SeekBar
-import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import kotlin.math.atan2
 
-abstract class BaseGameActivity : AppCompatActivity(), SensorEventListener {
+abstract class BaseGameActivity : AudioActivity(), SensorEventListener {
+
+    override val playsBattleMusic = true
 
     protected lateinit var sensorManager: SensorManager
     protected var accelerometer: Sensor? = null
@@ -64,6 +65,12 @@ abstract class BaseGameActivity : AppCompatActivity(), SensorEventListener {
     // 맵마다 레이아웃만 다르게
     abstract fun getLayoutId(): Int
 
+    protected open fun createEnemySpawner() = EnemySpawnAndManagement()
+
+    protected open fun createRewardManagement() = RewardManagement()
+
+    protected open fun onNormalAttackKill(enemy: Enemy) = Unit
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(getLayoutId())
@@ -83,7 +90,7 @@ abstract class BaseGameActivity : AppCompatActivity(), SensorEventListener {
 
         container = findViewById(R.id.mainContainer)
 
-        playerInfo = PlayerInfo()
+        playerInfo = PlayerInfo(::playSound)
         playerInfo.playerSprite = findViewById(R.id.square)
 
         sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
@@ -106,7 +113,7 @@ abstract class BaseGameActivity : AppCompatActivity(), SensorEventListener {
 
     private fun setupSettingsButton() {
         val settingsButton = findViewById<ImageButton>(R.id.btn_settings)
-        settingsButton.setOnClickListener {
+        settingsButton.setGameClickListener(::playSound) {
             isPaused = true
             val settingsXML = layoutInflater.inflate(R.layout.settings, null)
             val btnClose = settingsXML.findViewById<ImageButton>(R.id.btnSettingClose)
@@ -120,7 +127,7 @@ abstract class BaseGameActivity : AppCompatActivity(), SensorEventListener {
 
             seekBar.progress = sensitivity.toInt()
 
-            btnClose.setOnClickListener {
+            btnClose.setGameClickListener(::playSound) {
                 sensitivity = seekBar.progress.toFloat()
                 getSharedPreferences("game_settings", MODE_PRIVATE)
                     .edit().putFloat("sensitivity", sensitivity).apply()
@@ -198,11 +205,11 @@ abstract class BaseGameActivity : AppCompatActivity(), SensorEventListener {
         playerHPBar.visibility = View.VISIBLE
         playerNormalAttack.sprite.visibility = View.VISIBLE
 
-        enemySpawner = EnemySpawnAndManagement()
+        enemySpawner = createEnemySpawner()
         enemySpawner.container = findViewById(R.id.mainContainer)
         enemySpawner.context = this
 
-        rewardJewels = RewardManagement()
+        rewardJewels = createRewardManagement()
         rewardJewels.container = findViewById(R.id.mainContainer)
         rewardJewels.context = this
 
@@ -255,7 +262,9 @@ abstract class BaseGameActivity : AppCompatActivity(), SensorEventListener {
                     if (playerNormalAttack.checkCollision(enemy.getCenterX(), enemy.getCenterY(), enemy.radius)) {
                         enemy.takeDamage(playerNormalAttack.attackPower)
                         if (enemy.health <= 0f) {
+                            playSound(GameSound.ENEMY_DEFEATED)
                             rewardJewels.spawn(enemy.getCenterX(), enemy.getCenterY())
+                            onNormalAttackKill(enemy)
                             toRemove.add(enemy)
                         }
                     }
