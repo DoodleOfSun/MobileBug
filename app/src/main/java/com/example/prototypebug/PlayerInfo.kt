@@ -21,6 +21,8 @@ class PlayerInfo {
 
     var playerExp : Float = 0f
 
+    var playerExpScale = 0.3f
+
     fun playerReset(){
         x = 0f
         y = 0f
@@ -74,7 +76,7 @@ class PlayerInfo {
 
     fun playerGetExp(exp: Float, cont: Context) {
         playerExp += exp
-        if (playerExp >= 1f) {
+        if (playerExp >= playerExpScale) {
             playerExp = 0f
 
             if (cont is Map1Activity) {
@@ -92,7 +94,10 @@ class PlayerInfo {
                 dialog.setCancelable(false)
 
                 // 3개 랜덤 선택
-                val choices = cont.weaponManager.getRandomChoices(3)
+                //val choices = cont.weaponManager.getRandomChoices(3)
+
+                // 테스트용
+                val choices = cont.weaponManager.getSpecificChoices()
 
                 val text1 = levelupXML.findViewById<TextView>(R.id.text_choose1)
                 val btn1  = levelupXML.findViewById<ImageButton>(R.id.btn_choose1)
