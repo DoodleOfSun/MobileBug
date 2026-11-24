@@ -23,6 +23,8 @@ class PlayerInfo internal constructor(private val playSound: (GameSound) -> Unit
 
     var playerExp : Float = 0f
 
+    var playerExpScale = 0.3f
+
     fun playerReset(){
         x = 0f
         y = 0f
@@ -77,6 +79,7 @@ class PlayerInfo internal constructor(private val playSound: (GameSound) -> Unit
 
     fun playerGetExp(exp: Float, cont: Context) {
         playerExp += exp
+        if (playerExp >= playerExpScale) {
         if (exp > 0f) playSound(GameSound.EXP_PICKUP)
         if (playerExp >= 1f) {
             playerExp = 0f
@@ -97,7 +100,10 @@ class PlayerInfo internal constructor(private val playSound: (GameSound) -> Unit
                 dialog.setCancelable(false)
 
                 // 3개 랜덤 선택
-                val choices = cont.weaponManager.getRandomChoices(3)
+                //val choices = cont.weaponManager.getRandomChoices(3)
+
+                // 테스트용
+                val choices = cont.weaponManager.getSpecificChoices()
 
                 val text1 = levelupXML.findViewById<TextView>(R.id.text_choose1)
                 val btn1  = levelupXML.findViewById<ImageButton>(R.id.btn_choose1)

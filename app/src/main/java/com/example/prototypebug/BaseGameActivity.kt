@@ -10,6 +10,7 @@ import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.os.Bundle
+import android.util.Log
 import android.view.Choreographer
 import android.view.Surface
 import android.view.View
@@ -96,7 +97,7 @@ abstract class BaseGameActivity : AudioActivity(), SensorEventListener {
         sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
 
-        weaponManager = WeaponManager()
+        weaponManager = WeaponManager(container, this)
 
         initEntireSystem()
 
@@ -254,6 +255,7 @@ abstract class BaseGameActivity : AudioActivity(), SensorEventListener {
                     endGame()
                 }
 
+                // 노말 어택 업데이트 + 데미지
                 playerNormalAttack.update(
                     playerInfo.playerSprite.x,
                     playerInfo.playerSprite.y,
@@ -261,8 +263,6 @@ abstract class BaseGameActivity : AudioActivity(), SensorEventListener {
                     deltaTime
                 )
 
-                // 적 피격 처리 (기존 코드 유지)
-                val toRemove = mutableListOf<Enemy>()
                 enemySpawner.enemies.forEach { enemy ->
                     if (playerNormalAttack.checkCollision(enemy.getCenterX(), enemy.getCenterY(), enemy.radius)) {
                         enemy.takeDamage(playerNormalAttack.attackPower)
@@ -274,8 +274,22 @@ abstract class BaseGameActivity : AudioActivity(), SensorEventListener {
                         }
                     }
                 }
-                toRemove.forEach { enemySpawner.removeEnemy(it) }
+
+                // 모든 무기로 죽은 적 제거 (노말어택 + 새 무기 전부)
+                val deadEnemies = mutableListOf<Enemy>()
+
+                enemySpawner.enemies.forEach { enemy ->
+                    if (enemy.health <= 0f) {
+                        rewardJewels.spawn(enemy.getCenterX(), enemy.getCenterY())
+                        deadEnemies.add(enemy)
+                    }
+                }
+
+                deadEnemies.forEach { enemy ->
+                    enemySpawner.removeEnemy(enemy)
+                }
             }
+
             Choreographer.getInstance().postFrameCallback(gameLoop)
         }
         Choreographer.getInstance().postFrameCallback(gameLoop)

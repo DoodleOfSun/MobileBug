@@ -1,12 +1,24 @@
 package com.example.prototypebug
 
 import android.util.Log
+import androidx.constraintlayout.widget.ConstraintLayout
 
-class WeaponManager {
+class WeaponManager(
+    private val container: ConstraintLayout,
+    private val context: android.content.Context){
     private val ownedWeapons = mutableMapOf<String, Weapon>()
+
 
     fun getRandomChoices(count: Int = 3): List<WeaponType> {
         return WeaponDatabase.all.shuffled().take(count)
+    }
+
+    fun getSpecificChoices(): List<WeaponType> {
+        return listOf(
+            WeaponDatabase.getById("ring")!!,
+            WeaponDatabase.getById("bomb")!!,
+            WeaponDatabase.getById("bone")!!
+        )
     }
 
     fun addOrLevelUp(type: WeaponType) {
@@ -30,6 +42,9 @@ class WeaponManager {
         return when (type.id) {
             "arrow"  -> ArrowWeapon(type)
             "dagger" -> DaggerWeapon(type)
+            "bone" -> BoneWeapon(type, container, context)
+            "ring" -> RingWeapon(type, container, context)
+            "bomb" -> BombWeapon(type, container, context)
             else     -> EmptyWeapon(type)
         }
     }
