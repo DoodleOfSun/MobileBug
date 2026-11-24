@@ -10,15 +10,7 @@ class WeaponManager(
 
 
     fun getRandomChoices(count: Int = 3): List<WeaponType> {
-        return WeaponDatabase.all.shuffled().take(count)
-    }
-
-    fun getSpecificChoices(): List<WeaponType> {
-        return listOf(
-            WeaponDatabase.getById("ring")!!,
-            WeaponDatabase.getById("bomb")!!,
-            WeaponDatabase.getById("bone")!!
-        )
+        return WeaponDatabase.all.filter { it.create != null }.shuffled().take(count)
     }
 
     fun addOrLevelUp(type: WeaponType) {
@@ -27,7 +19,7 @@ class WeaponManager(
             existing.level++
             existing.onLevelUp()
         } else {
-            ownedWeapons[type.id] = createWeapon(type)
+            ownedWeapons[type.id] = type.create?.invoke(type, container, context) ?: EmptyWeapon(type)
         }
         Log.d("Weapon", "${type.name} → 레벨 ${ownedWeapons[type.id]?.level}")
     }
@@ -35,17 +27,6 @@ class WeaponManager(
     fun updateAll(deltaTime: Float, player: PlayerInfo, enemies: List<Enemy>) {
         ownedWeapons.values.forEach {
             it.update(deltaTime, player, enemies)
-        }
-    }
-
-    private fun createWeapon(type: WeaponType): Weapon {
-        return when (type.id) {
-            "arrow"  -> ArrowWeapon(type)
-            "dagger" -> DaggerWeapon(type)
-            "bone" -> BoneWeapon(type, container, context)
-            "ring" -> RingWeapon(type, container, context)
-            "bomb" -> BombWeapon(type, container, context)
-            else     -> EmptyWeapon(type)
         }
     }
 
