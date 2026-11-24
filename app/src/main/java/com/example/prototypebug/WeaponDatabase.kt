@@ -4,7 +4,7 @@ object WeaponDatabase {
     val all = listOf(
         WeaponType("axe",      "도끼",     R.drawable.axe,      "위로 튀어오른 뒤 떨어진다"),
         WeaponType("book",     "책",       R.drawable.book,     "주변을 회전하며 공격"),
-        WeaponType("arrow",    "화살",     R.drawable.arrow,    "가장 가까운 적을 추적"),
+        WeaponType("arrow",    "화살",     R.drawable.arrow,    "가장 가까운 적을 추적", { type, arena, _ -> ArrowWeapon(type, arena) }),
         WeaponType("sickle",    "낫",     R.drawable.sickle,    "직선으로 날아간다"),
         WeaponType("dagger",   "단검",     R.drawable.dagger,   "이동 방향으로 발사"),
         WeaponType("missile",  "미사일",   R.drawable.missile,  "범위 표시 후 낙하"),
