@@ -226,8 +226,13 @@ abstract class BaseGameActivity : AppCompatActivity(), SensorEventListener {
 
                 if (secTime >= monsterSpawnTimeDelay) {
                     waveCount++
-                    repeat(9) { enemySpawner.spawnFromEdge() }
-                    if (waveCount % 10 == 0) enemySpawner.spawnBoss()
+                    if (this is Map2Activity) {
+                        repeat(9) { enemySpawner.spawnRangedFromEdge() }               // Map2: 원거리
+                        if (waveCount % 10 == 0) enemySpawner.spawnRangedBoss()        // Map2: 원거리 보스
+                    } else {
+                        repeat(9) { enemySpawner.spawnFromEdge() }                      // Map1: 일반
+                        if (waveCount % 10 == 0) enemySpawner.spawnBoss()              // Map1: 근접 보스
+                    }
                     secTime -= monsterSpawnTimeDelay
                 }
 

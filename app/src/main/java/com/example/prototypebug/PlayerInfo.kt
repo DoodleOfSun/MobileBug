@@ -77,7 +77,7 @@ class PlayerInfo {
         if (playerExp >= 1f) {
             playerExp = 0f
 
-            if (cont is Map1Activity) {
+            if (cont is BaseGameActivity) {
                 cont.setPause(true)
 
                 val levelupXML = cont.layoutInflater.inflate(R.layout.level_up_settings, null)

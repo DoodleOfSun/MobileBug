@@ -20,8 +20,7 @@ class MapSelectActivity : AppCompatActivity() {
         }
 
         findViewById<ImageButton>(R.id.btn_map2).setOnClickListener {
-            // 맵 2로 게임 시작 (나중에 Map2Activity로 바꿔도 됨)
-            //startActivity(Intent(this, GameActivity::class.java))
+            startActivity(Intent(this, Map2Activity::class.java))
         }
     }
 }
