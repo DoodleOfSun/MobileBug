@@ -82,7 +82,7 @@ class PlayerInfo internal constructor(private val playSound: (GameSound) -> Unit
             playerExp = 0f
             playSound(GameSound.LEVEL_UP)
 
-            if (cont is Map1Activity) {
+            if (cont is BaseGameActivity) {
                 cont.setPause(true)
 
                 val levelupXML = cont.layoutInflater.inflate(R.layout.level_up_settings, null)

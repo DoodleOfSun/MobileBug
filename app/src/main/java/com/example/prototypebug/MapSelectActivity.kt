@@ -18,9 +18,8 @@ class MapSelectActivity : AudioActivity() {
             startActivity(Intent(this, Map1Activity::class.java))
         }
 
-        findViewById<ImageButton>(R.id.btn_map2).setGameClickListener(::playSound) {
-            // 맵 2로 게임 시작 (나중에 Map2Activity로 바꿔도 됨)
-            //startActivity(Intent(this, GameActivity::class.java))
+        findViewById<ImageButton>(R.id.btn_map2).setOnClickListener {
+            startActivity(Intent(this, Map2Activity::class.java))
         }
     }
 }
