@@ -79,9 +79,8 @@ class PlayerInfo internal constructor(private val playSound: (GameSound) -> Unit
 
     fun playerGetExp(exp: Float, cont: Context) {
         playerExp += exp
+        if (exp > 0f) {playSound(GameSound.EXP_PICKUP)}
         if (playerExp >= playerExpScale) {
-        if (exp > 0f) playSound(GameSound.EXP_PICKUP)
-        if (playerExp >= 1f) {
             playerExp = 0f
             playSound(GameSound.LEVEL_UP)
 
