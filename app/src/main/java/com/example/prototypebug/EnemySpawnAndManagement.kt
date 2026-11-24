@@ -4,13 +4,17 @@ import android.content.Context
 import android.util.Log
 import android.view.ViewGroup
 import android.widget.ImageView
+import androidx.annotation.DrawableRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.sqrt
 import kotlin.random.Random
 
-class EnemySpawnAndManagement {
+class EnemySpawnAndManagement(
+    @param:DrawableRes private val enemyDrawable: Int = R.drawable.enemycircle,
+    @param:DrawableRes private val bossDrawable: Int = R.drawable.enemycircle
+) {
     lateinit var container: ViewGroup
     lateinit var context: Context
 
@@ -26,7 +30,7 @@ class EnemySpawnAndManagement {
         val enemySizePx = 60
 
         enemyView.layoutParams = ConstraintLayout.LayoutParams(enemySizePx, enemySizePx)
-        enemyView.setImageResource(R.drawable.enemycircle)
+        enemyView.setImageResource(enemyDrawable)
 
         container.addView(enemyView)
 
@@ -55,7 +59,7 @@ class EnemySpawnAndManagement {
         val bossSizePx = 120
 
         enemyView.layoutParams = ConstraintLayout.LayoutParams(bossSizePx, bossSizePx)
-        enemyView.setImageResource(R.drawable.enemycircle)
+        enemyView.setImageResource(bossDrawable)
         container.addView(enemyView)
 
         val boss = Boss()

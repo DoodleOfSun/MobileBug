@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="map1_arena_center">#101D33</color>
+    <color name="map1_arena_edge">#080F20</color>
+    <color name="map1_arena_grid">#1A2A42</color>
+    <color name="map1_player_hull">#104854</color>
+    <color name="map1_player_panel">#19838C</color>
+    <color name="map1_player_edge">#5DE8DE</color>
+    <color name="map1_player_core">#CBFFF6</color>
+    <color name="map1_enemy_hull">#601F32</color>
+    <color name="map1_enemy_panel">#A73447</color>
+    <color name="map1_enemy_edge">#FF626C</color>
+    <color name="map1_enemy_core">#FFD0CB</color>
+    <color name="map1_boss_hull">#33204F</color>
+    <color name="map1_boss_panel">#683B9C</color>
+    <color name="map1_boss_edge">#C186FF</color>
+    <color name="map1_boss_core">#F2D6FF</color>
+    <color name="map1_attack_glow">#B066D6FF</color>
+    <color name="map1_attack_clear">#0066D6FF</color>
+    <color name="map1_attack_body">#2363BA</color>
+    <color name="map1_attack_rim">#86DFFF</color>
+    <color name="map1_attack_core">#E9FAFF</color>
+    <color name="map1_burst_ring">#FFA060</color>
+    <color name="map1_burst_core">#FFF0BD</color>
+</resources>

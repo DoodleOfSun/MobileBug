@@ -4,10 +4,9 @@ import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.widget.ImageButton
-import androidx.appcompat.app.AppCompatActivity
 import kotlin.jvm.java
 
-class MapSelectActivity : AppCompatActivity() {
+class MapSelectActivity : AudioActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -15,7 +14,7 @@ class MapSelectActivity : AppCompatActivity() {
 
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
 
-        findViewById<ImageButton>(R.id.btn_map1).setOnClickListener {
+        findViewById<ImageButton>(R.id.btn_map1).setGameClickListener(::playSound) {
             startActivity(Intent(this, Map1Activity::class.java))
         }
 

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:centerX="0.5"
+                android:centerY="0.5"
+                android:startColor="@color/map1_arena_center"
+                android:endColor="@color/map1_arena_edge"
+                android:gradientRadius="460dp"
+                android:type="radial" />
+        </shape>
+    </item>
+    <item>
+        <bitmap
+            android:src="@drawable/map1_grid_tile"
+            android:tileMode="repeat"
+            android:tint="@color/map1_arena_grid" />
+    </item>
+</layer-list>
