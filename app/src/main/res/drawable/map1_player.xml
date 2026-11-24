@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="50dp"
+    android:height="50dp"
+    android:viewportWidth="64"
+    android:viewportHeight="64">
+    <path
+        android:fillColor="@color/map1_player_hull"
+        android:strokeColor="@color/map1_player_edge"
+        android:strokeWidth="2.5"
+        android:pathData="M10,2 H54 L62,10 V54 L54,62 H10 L2,54 V10 Z" />
+    <path
+        android:fillColor="@color/map1_player_panel"
+        android:pathData="M16,12 H48 L52,16 V48 L48,52 H16 L12,48 V16 Z" />
+    <path
+        android:fillColor="@color/map1_player_edge"
+        android:pathData="M9,19 H12 V45 H9 Z M52,19 H55 V45 H52 Z M22,7 H42 V10 H22 Z M22,54 H42 V57 H22 Z" />
+    <path
+        android:fillColor="@color/map1_player_hull"
+        android:pathData="M22,21 H38 L47,32 L38,43 H22 L27,32 Z" />
+    <path
+        android:fillColor="@color/map1_player_core"
+        android:pathData="M29,25 H37 L43,32 L37,39 H29 L33,32 Z" />
+</vector>

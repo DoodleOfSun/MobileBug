@@ -33,6 +33,12 @@
             android:windowSoftInputMode="adjustResize" />
 
         <activity
+            android:name=".Map2Activity"
+            android:exported="false"
+            android:screenOrientation="landscape"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
             android:name=".ResultActivity"
             android:exported="false"
             android:screenOrientation="landscape" />

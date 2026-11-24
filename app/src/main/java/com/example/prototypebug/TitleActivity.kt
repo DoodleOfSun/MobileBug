@@ -17,10 +17,9 @@ import android.view.View
 import android.view.Window
 import android.widget.ImageButton
 import android.widget.SeekBar
-import androidx.appcompat.app.AppCompatActivity
 import kotlin.math.atan2
 
-class TitleActivity : AppCompatActivity(), SensorEventListener {
+class TitleActivity : AudioActivity(), SensorEventListener {
 
     private lateinit var sensorManager: SensorManager
     private var accelerometer: Sensor? = null
@@ -49,6 +48,7 @@ class TitleActivity : AppCompatActivity(), SensorEventListener {
         // 화면 터치 → 맵 선택으로
         findViewById<View>(R.id.mainContainer).setOnTouchListener { _, event ->
             if (event.action == MotionEvent.ACTION_DOWN) {
+                playSound(GameSound.BUTTON_CLICK)
                 startActivity(Intent(this, MapSelectActivity::class.java))
             }
             true
@@ -56,7 +56,7 @@ class TitleActivity : AppCompatActivity(), SensorEventListener {
 
         // 설정 버튼
         val settingsButton = findViewById<ImageButton>(R.id.btn_settings)
-        settingsButton.setOnClickListener {
+        settingsButton.setGameClickListener(::playSound) {
             isPaused = true
             val settingsXML = layoutInflater.inflate(R.layout.settings, null)
             val btnClose = settingsXML.findViewById<ImageButton>(R.id.btnSettingClose)
@@ -70,7 +70,7 @@ class TitleActivity : AppCompatActivity(), SensorEventListener {
 
             seekBar.progress = sensitivity.toInt()
 
-            btnClose.setOnClickListener {
+            btnClose.setGameClickListener(::playSound) {
                 isPaused = false
                 sensitivity = seekBar.progress.toFloat()
                 prefs.edit().putFloat("sensitivity", sensitivity).apply()

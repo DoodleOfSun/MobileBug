@@ -18,7 +18,7 @@ open class Enemy {
     fun getCenterX() = x + radius
     fun getCenterY() = y + radius
 
-    fun update(targetX: Float, targetY: Float) {
+    open fun update(targetX: Float, targetY: Float) {
         val dx = targetX - x
         val dy = targetY - y
         val distance = sqrt(dx * dx + dy * dy)
