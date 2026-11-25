@@ -98,11 +98,7 @@ class PlayerInfo internal constructor(private val playSound: (GameSound) -> Unit
                 )
                 dialog.setCancelable(false)
 
-                // 3개 랜덤 선택
-                //val choices = cont.weaponManager.getRandomChoices(3)
-
-                // 테스트용
-                val choices = cont.weaponManager.getSpecificChoices()
+                val choices = cont.weaponManager.getRandomChoices(3)
 
                 val text1 = levelupXML.findViewById<TextView>(R.id.text_choose1)
                 val btn1  = levelupXML.findViewById<ImageButton>(R.id.btn_choose1)
