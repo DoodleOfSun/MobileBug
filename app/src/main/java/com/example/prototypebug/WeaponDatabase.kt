@@ -2,7 +2,7 @@ package com.example.prototypebug
 
 object WeaponDatabase {
     val all = listOf(
-        WeaponType("axe",      "도끼",     R.drawable.axe,      "위로 튀어오른 뒤 떨어진다"),
+        WeaponType("axe",      "도끼",     R.drawable.axe,      "위로 튀어오른 뒤 떨어진다", { type, arena, _ -> AxeWeapon(type, arena) }),
         WeaponType("book",     "책",       R.drawable.book,     "주변을 회전하며 공격"),
         WeaponType("arrow",    "화살",     R.drawable.arrow,    "가장 가까운 적을 추적"),
         WeaponType("sickle",    "낫",     R.drawable.sickle,    "직선으로 날아간다"),
