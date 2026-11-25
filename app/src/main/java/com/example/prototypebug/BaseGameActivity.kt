@@ -263,6 +263,8 @@ abstract class BaseGameActivity : AudioActivity(), SensorEventListener {
                     deltaTime
                 )
 
+                val toRemove = mutableListOf<Enemy>()
+
                 enemySpawner.enemies.forEach { enemy ->
                     if (playerNormalAttack.checkCollision(enemy.getCenterX(), enemy.getCenterY(), enemy.radius)) {
                         enemy.takeDamage(playerNormalAttack.attackPower)
