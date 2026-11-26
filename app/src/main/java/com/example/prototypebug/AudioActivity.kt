@@ -2,10 +2,12 @@ package com.example.prototypebug
 
 import android.media.AudioManager
 import android.view.View
+import androidx.annotation.RawRes
 import androidx.appcompat.app.AppCompatActivity
 
 abstract class AudioActivity : AppCompatActivity() {
-    protected open val playsBattleMusic = false
+    @get:RawRes
+    protected open val battleMusicResource: Int? = null
 
     private val audio by lazy { GameAudioManager.from(applicationContext) }
     private val musicOwner = Any()
@@ -20,13 +22,13 @@ abstract class AudioActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         audioResumed = true
-        if (playsBattleMusic) audio.resumeBattleMusic(musicOwner)
+        battleMusicResource?.let { audio.resumeBattleMusic(musicOwner, it) }
     }
 
     override fun onPause() {
         audioResumed = false
         audio.screenPaused()
-        if (playsBattleMusic) {
+        if (battleMusicResource != null) {
             if (isFinishing) audio.releaseBattleMusic(musicOwner)
             else audio.pauseBattleMusic(musicOwner)
         }
@@ -39,7 +41,7 @@ abstract class AudioActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
-        if (playsBattleMusic) audio.releaseBattleMusic(musicOwner)
+        if (battleMusicResource != null) audio.releaseBattleMusic(musicOwner)
         super.onDestroy()
     }
 

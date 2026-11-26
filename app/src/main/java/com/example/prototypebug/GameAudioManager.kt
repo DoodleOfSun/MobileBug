@@ -23,7 +23,6 @@ private data class SoundEffect(
 private object GameAudioConfig {
     const val EFFECT_VOLUME = 0.75f
     const val MUSIC_VOLUME = 0.30f
-    val battleMusic = R.raw.battle_bgm
 
     val effects = mapOf(
         GameSound.PLAYER_HIT to SoundEffect(R.raw.sfx_player_hit, 0.85f, 180, priority = 2),
@@ -131,7 +130,7 @@ internal class GameAudioManager private constructor(private val context: Context
         }
     }
 
-    fun resumeBattleMusic(owner: Any) {
+    fun resumeBattleMusic(owner: Any, @RawRes resource: Int) {
         if (musicOwner !== owner) releaseMusic()
         musicOwner = owner
         musicRequested = true
@@ -145,7 +144,7 @@ internal class GameAudioManager private constructor(private val context: Context
         music = player
         try {
             player.setAudioAttributes(attributes)
-            context.resources.openRawResourceFd(GameAudioConfig.battleMusic).use { asset ->
+            context.resources.openRawResourceFd(resource).use { asset ->
                 player.setDataSource(asset.fileDescriptor, asset.startOffset, asset.length)
             }
             player.setOnPreparedListener { prepared ->
