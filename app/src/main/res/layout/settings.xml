@@ -46,14 +46,20 @@
         app:layout_constraintStart_toStartOf="@id/settingsTitleBand"
         app:layout_constraintTop_toTopOf="@id/settingsTitleBand" />
 
-    <!-- SETTINGS 글자 (패널 가로 가운데) -->
-    <ImageView
+    <!-- SETTINGS 글자 (패널 가로 가운데, 시안 글자색 + 어두운 그림자) -->
+    <TextView
         android:id="@+id/settingsTitleText"
         android:layout_width="wrap_content"
-        android:layout_height="24dp"
-        android:adjustViewBounds="true"
-        android:contentDescription="Settings"
-        android:src="@drawable/settings_title_text"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/youre_gone"
+        android:includeFontPadding="false"
+        android:shadowColor="#3C4232"
+        android:shadowDx="0"
+        android:shadowDy="2"
+        android:shadowRadius="3"
+        android:text="SETTINGS"
+        android:textColor="#E3D5B5"
+        android:textSize="24sp"
         app:layout_constraintBottom_toBottomOf="@id/settingsTitleBand"
         app:layout_constraintEnd_toEndOf="@id/settingsPanel"
         app:layout_constraintStart_toStartOf="@id/settingsPanel"
@@ -75,15 +81,21 @@
         app:layout_constraintTop_toTopOf="@id/settingsPanel" />
 
     <!-- SENSITIVITY 글자 -->
-    <ImageView
+    <TextView
         android:id="@+id/settingsSensitivityText"
         android:layout_width="wrap_content"
-        android:layout_height="20dp"
+        android:layout_height="wrap_content"
         android:layout_marginStart="30dp"
-        android:layout_marginTop="84dp"
-        android:adjustViewBounds="true"
-        android:contentDescription="@string/sensitivity"
-        android:src="@drawable/settings_sensitivity_text"
+        android:layout_marginTop="82dp"
+        android:fontFamily="@font/youre_gone"
+        android:includeFontPadding="false"
+        android:shadowColor="#3C4232"
+        android:shadowDx="0"
+        android:shadowDy="2"
+        android:shadowRadius="3"
+        android:text="SENSITIVITY"
+        android:textColor="#E3D5B5"
+        android:textSize="19sp"
         app:layout_constraintStart_toStartOf="@id/settingsPanel"
         app:layout_constraintTop_toTopOf="@id/settingsPanel" />
 
