@@ -40,13 +40,18 @@ open class RangedEnemy : Enemy() {
 
     // 움직임: 멀거나 화면 밖이면 다가감, 아니면 멈춤
     override fun update(targetX: Float, targetY: Float) {
+        moveToward(targetX, targetY, detouring = false)
+    }
+
+    internal fun moveToward(targetX: Float, targetY: Float, detouring: Boolean) {
         val dx = targetX - getCenterX()
         val dy = targetY - getCenterY()
         val dist = sqrt(dx * dx + dy * dy)
 
-        if (dist > 1f && (dist > attackRange || !isOnScreen())) {
-            x += dx / dist * moveSpeed
-            y += dy / dist * moveSpeed
+        if (dist > 1f && (detouring || dist > attackRange || !isOnScreen())) {
+            val step = if (detouring) minOf(moveSpeed, dist) else moveSpeed
+            x += dx / dist * step
+            y += dy / dist * step
         }
 
         enemySprite.x = x

@@ -26,7 +26,7 @@ import kotlin.math.atan2
 
 abstract class BaseGameActivity : AudioActivity(), SensorEventListener {
 
-    override val playsBattleMusic = true
+    override val battleMusicResource: Int = R.raw.battle_bgm
 
     protected lateinit var sensorManager: SensorManager
     protected var accelerometer: Sensor? = null
@@ -71,6 +71,8 @@ abstract class BaseGameActivity : AudioActivity(), SensorEventListener {
     protected open fun createRewardManagement() = RewardManagement()
 
     protected open fun onNormalAttackKill(enemy: Enemy) = Unit
+
+    protected open fun constrainPlayerMovement(previousX: Float, previousY: Float) = Unit
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -181,6 +183,8 @@ abstract class BaseGameActivity : AudioActivity(), SensorEventListener {
         velX *= damping
         velY *= damping
 
+        val previousX = playerInfo.x
+        val previousY = playerInfo.y
         playerInfo.x += velX
         playerInfo.y += velY
 
@@ -188,6 +192,7 @@ abstract class BaseGameActivity : AudioActivity(), SensorEventListener {
         val maxY = (container.height - playerInfo.playerSprite.height).coerceAtLeast(0).toFloat()
         playerInfo.x = playerInfo.x.coerceIn(0f, maxX)
         playerInfo.y = playerInfo.y.coerceIn(0f, maxY)
+        constrainPlayerMovement(previousX, previousY)
 
         playerInfo.playerSprite.x = playerInfo.x
         playerInfo.playerSprite.y = playerInfo.y

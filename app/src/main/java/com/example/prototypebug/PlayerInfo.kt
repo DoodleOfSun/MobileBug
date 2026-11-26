@@ -54,7 +54,6 @@ class PlayerInfo internal constructor(private val playSound: (GameSound) -> Unit
         }
 
         health -= damageData
-        if (damageData > 0) playSound(GameSound.PLAYER_HIT)
 
         if (health < 0){
             health = 0

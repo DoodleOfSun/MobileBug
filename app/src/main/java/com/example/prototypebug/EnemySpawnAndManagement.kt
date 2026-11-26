@@ -7,6 +7,7 @@ import android.widget.ImageView
 import androidx.annotation.DrawableRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import kotlin.math.cos
+import kotlin.math.atan2
 import kotlin.math.sin
 import kotlin.math.sqrt
 import kotlin.random.Random
@@ -17,6 +18,7 @@ class EnemySpawnAndManagement(
 ) {
     lateinit var container: ViewGroup
     lateinit var context: Context
+    internal var map2Cover: Map2Cover? = null
 
     private var monsterDamageDelay = 2f
 
@@ -90,7 +92,7 @@ class EnemySpawnAndManagement(
         val bossSizePx = 120
 
         enemyView.layoutParams = ConstraintLayout.LayoutParams(bossSizePx, bossSizePx)
-        enemyView.setImageResource(R.drawable.round_grey_detailed_red)   // 임시 그림 (원거리 몬스터와 같은 그림, 크기만 2배)
+        enemyView.setImageResource(R.drawable.map2_ranged_boss)
         container.addView(enemyView)
 
         val boss = RangedBoss()
@@ -136,7 +138,7 @@ class EnemySpawnAndManagement(
 
         val view = ImageView(context)
         view.layoutParams = ConstraintLayout.LayoutParams(60, 60)
-        view.setImageResource(R.drawable.round_grey_detailed_red)   // 임시 그림
+        view.setImageResource(R.drawable.map2_ranged_zombie)
         container.addView(view)
 
         val ranged = RangedEnemy()
@@ -160,8 +162,11 @@ class EnemySpawnAndManagement(
 
         val view = ImageView(context)
         view.layoutParams = ConstraintLayout.LayoutParams(shooter.bulletSize, shooter.bulletSize)
-        view.setBackgroundResource(R.drawable.enemy_bullet)
-        view.background.mutate().setTint(shooter.bulletColor)   // 이 탄만 따로 색칠
+        view.setImageResource(
+            if (shooter is RangedBoss) R.drawable.map2_boss_bolt else R.drawable.map2_enemy_bolt
+        )
+        view.scaleType = ImageView.ScaleType.FIT_XY
+        view.rotation = Math.toDegrees(atan2(dy, dx).toDouble()).toFloat()
         container.addView(view)
 
         val bullet = EnemyBullet(
@@ -183,17 +188,20 @@ class EnemySpawnAndManagement(
         val iterator = bullets.iterator()
         while (iterator.hasNext()) {
             val bullet = iterator.next()
+            val previousX = bullet.x
+            val previousY = bullet.y
             bullet.update(deltaTime)
 
+            val blocked = map2Cover?.blocks(previousX, previousY, bullet.x, bullet.y, bullet.radius) == true
             val dx = player.getCenterX() - bullet.x
             val dy = player.getCenterY() - bullet.y
             val hit = sqrt(dx * dx + dy * dy) < player.radius + bullet.radius
             val out = bullet.x < -50f || bullet.x > width + 50f ||
                       bullet.y < -50f || bullet.y > height + 50f
 
-            if (hit) player.playerGetDamaged(bullet.damage)
+            if (hit && !blocked) player.playerGetDamaged(bullet.damage)
 
-            if (hit || out || bullet.life <= 0f) {
+            if (blocked || hit || out || bullet.life <= 0f) {
                 container.removeView(bullet.sprite)
                 iterator.remove()
             }
@@ -205,7 +213,20 @@ class EnemySpawnAndManagement(
         // 플레이어를 추적
         // ====================================================================================
 
-        enemies.forEach { it.update(player.getCenterX(), player.getCenterY()) }
+        val cover = map2Cover
+        val playerX = player.getCenterX()
+        val playerY = player.getCenterY()
+        enemies.forEach { enemy ->
+            val previousX = enemy.x
+            val previousY = enemy.y
+            val waypoint = cover?.detour(enemy.getCenterX(), enemy.getCenterY(), playerX, playerY, enemy.radius)
+            if (enemy is RangedEnemy && waypoint != null) {
+                enemy.moveToward(waypoint.x, waypoint.y, detouring = true)
+            } else {
+                enemy.update(playerX, playerY)
+            }
+            cover?.constrainEnemy(enemy, previousX, previousY)
+        }
 
         val slop = 0.5f
         repeat(4) {
@@ -226,10 +247,16 @@ class EnemySpawnAndManagement(
                         val overlap = minDist - dist
                         val nx = dx / dist
                         val ny = dy / dist
+                        val previousAX = a.x
+                        val previousAY = a.y
+                        val previousBX = b.x
+                        val previousBY = b.y
                         a.x -= nx * overlap * 0.5f
                         a.y -= ny * overlap * 0.5f
                         b.x += nx * overlap * 0.5f
                         b.y += ny * overlap * 0.5f
+                        cover?.constrainEnemy(a, previousAX, previousAY)
+                        cover?.constrainEnemy(b, previousBX, previousBY)
                         a.enemySprite.x = a.x
                         a.enemySprite.y = a.y
                         b.enemySprite.x = b.x
@@ -252,8 +279,11 @@ class EnemySpawnAndManagement(
                     val overlap = minDist - dist
                     val nx = dx / dist
                     val ny = dy / dist
+                    val previousX = enemy.x
+                    val previousY = enemy.y
                     enemy.x -= nx * overlap
                     enemy.y -= ny * overlap
+                    cover?.constrainEnemy(enemy, previousX, previousY)
                     enemy.enemySprite.x = enemy.x
                     enemy.enemySprite.y = enemy.y
                 }
