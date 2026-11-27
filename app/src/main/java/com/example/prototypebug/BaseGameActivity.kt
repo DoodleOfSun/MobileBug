@@ -137,6 +137,7 @@ abstract class BaseGameActivity : AudioActivity(), SensorEventListener {
             }
 
             seekBar.progress = sensitivity.toInt()
+            setupVolumeBars(settingsXML)
 
             btnClose.setGameClickListener(::playSound) {
                 sensitivity = seekBar.progress.toFloat()

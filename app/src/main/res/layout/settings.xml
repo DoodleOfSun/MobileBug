@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- 설정창 (시작화면·게임 화면 공용). 코드에서 쓰는 id: btnSettingClose, sensitivityBar -->
+<!-- 설정창 (시작화면·게임 화면 공용). 코드에서 쓰는 id: btnSettingClose, sensitivityBar, musicVolumeBar, effectVolumeBar -->
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="550dp"
@@ -10,7 +10,7 @@
     <ImageView
         android:id="@+id/settingsPanel"
         android:layout_width="0dp"
-        android:layout_height="250dp"
+        android:layout_height="320dp"
         android:importantForAccessibility="no"
         android:scaleType="fitXY"
         android:src="@drawable/settings_panel"
@@ -86,7 +86,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="30dp"
-        android:layout_marginTop="82dp"
+        android:layout_marginTop="64dp"
         android:fontFamily="@font/youre_gone"
         android:includeFontPadding="false"
         android:shadowColor="#3C4232"
@@ -105,7 +105,7 @@
         android:layout_width="0dp"
         android:layout_height="40dp"
         android:layout_marginStart="18dp"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="2dp"
         android:layout_marginEnd="18dp"
         android:max="40"
         android:maxHeight="10dp"
@@ -119,19 +119,97 @@
         app:layout_constraintStart_toStartOf="@id/settingsPanel"
         app:layout_constraintTop_toBottomOf="@id/settingsSensitivityText" />
 
+    <!-- BGM 글자 -->
+    <TextView
+        android:id="@+id/settingsMusicText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="30dp"
+        android:layout_marginTop="6dp"
+        android:fontFamily="@font/youre_gone"
+        android:includeFontPadding="false"
+        android:shadowColor="#3C4232"
+        android:shadowDx="0"
+        android:shadowDy="2"
+        android:shadowRadius="3"
+        android:text="BGM"
+        android:textColor="#E3D5B5"
+        android:textSize="19sp"
+        app:layout_constraintStart_toStartOf="@id/settingsPanel"
+        app:layout_constraintTop_toBottomOf="@id/sensitivityBar" />
+
+    <!-- 배경음 크기 (0~100, 앱 전체 공용) -->
+    <SeekBar
+        android:id="@+id/musicVolumeBar"
+        android:layout_width="0dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="18dp"
+        android:layout_marginTop="2dp"
+        android:layout_marginEnd="18dp"
+        android:max="100"
+        android:maxHeight="10dp"
+        android:min="0"
+        android:minHeight="10dp"
+        android:progress="100"
+        android:progressDrawable="@drawable/settings_seekbar_progress"
+        android:splitTrack="false"
+        android:thumb="@drawable/settings_seekbar_thumb"
+        app:layout_constraintEnd_toEndOf="@id/settingsPanel"
+        app:layout_constraintStart_toStartOf="@id/settingsPanel"
+        app:layout_constraintTop_toBottomOf="@id/settingsMusicText" />
+
+    <!-- SFX 글자 -->
+    <TextView
+        android:id="@+id/settingsEffectText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="30dp"
+        android:layout_marginTop="6dp"
+        android:fontFamily="@font/youre_gone"
+        android:includeFontPadding="false"
+        android:shadowColor="#3C4232"
+        android:shadowDx="0"
+        android:shadowDy="2"
+        android:shadowRadius="3"
+        android:text="SFX"
+        android:textColor="#E3D5B5"
+        android:textSize="19sp"
+        app:layout_constraintStart_toStartOf="@id/settingsPanel"
+        app:layout_constraintTop_toBottomOf="@id/musicVolumeBar" />
+
+    <!-- 효과음 크기 (0~100, 앱 전체 공용) -->
+    <SeekBar
+        android:id="@+id/effectVolumeBar"
+        android:layout_width="0dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="18dp"
+        android:layout_marginTop="2dp"
+        android:layout_marginEnd="18dp"
+        android:max="100"
+        android:maxHeight="10dp"
+        android:min="0"
+        android:minHeight="10dp"
+        android:progress="100"
+        android:progressDrawable="@drawable/settings_seekbar_progress"
+        android:splitTrack="false"
+        android:thumb="@drawable/settings_seekbar_thumb"
+        app:layout_constraintEnd_toEndOf="@id/settingsPanel"
+        app:layout_constraintStart_toStartOf="@id/settingsPanel"
+        app:layout_constraintTop_toBottomOf="@id/settingsEffectText" />
+
     <!-- 구분선 -->
     <ImageView
         android:id="@+id/settingsDivider"
         android:layout_width="0dp"
         android:layout_height="4dp"
         android:layout_marginStart="28dp"
-        android:layout_marginTop="22dp"
+        android:layout_marginTop="10dp"
         android:layout_marginEnd="28dp"
         android:importantForAccessibility="no"
         android:scaleType="fitXY"
         android:src="@drawable/settings_divider"
         app:layout_constraintEnd_toEndOf="@id/settingsPanel"
         app:layout_constraintStart_toStartOf="@id/settingsPanel"
-        app:layout_constraintTop_toBottomOf="@id/sensitivityBar" />
+        app:layout_constraintTop_toBottomOf="@id/effectVolumeBar" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

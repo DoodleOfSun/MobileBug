@@ -77,6 +77,7 @@ class TitleActivity : AudioActivity(), SensorEventListener {
             }
 
             seekBar.progress = sensitivity.toInt()
+            setupVolumeBars(settingsXML)
 
             btnClose.setGameClickListener(::playSound) {
                 isPaused = false
