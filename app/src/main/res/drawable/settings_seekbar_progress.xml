@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 감도 슬라이더 막대: 회색(빈 부분) 위에 주황(채워진 부분)을 진행도만큼 잘라서 보여줌.
+     받은 막대 그림과 같은 색을 도형으로 그려서, 늘려도 양 끝이 둥글게 유지됨 -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@android:id/background">
+        <shape android:shape="rectangle">
+            <corners android:radius="5dp" />
+            <solid android:color="#585E45" />
+        </shape>
+    </item>
+    <item android:id="@android:id/progress">
+        <clip
+            android:clipOrientation="horizontal"
+            android:gravity="start">
+            <shape android:shape="rectangle">
+                <corners android:radius="5dp" />
+                <solid android:color="#E95D2D" />
+            </shape>
+        </clip>
+    </item>
+</layer-list>
