@@ -51,6 +51,27 @@ internal class GameAudioManager private constructor(private val context: Context
     private val lastPlayed = mutableMapOf<GameSound, Long>()
 
     private var music: MediaPlayer? = null
+    private val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+
+    /** 설정창의 배경음 크기 (0~100). 앱 전체 공용이라 어느 화면에서 바꿔도 똑같이 적용되고 저장됨 */
+    var musicLevel: Int = prefs.getInt(KEY_MUSIC_LEVEL, MAX_LEVEL).coerceIn(0, MAX_LEVEL)
+        set(value) {
+            field = value.coerceIn(0, MAX_LEVEL)
+            prefs.edit().putInt(KEY_MUSIC_LEVEL, field).apply()
+            // 이미 나오고 있는 배경음도 바로 크기를 바꿈
+            if (musicPrepared) music?.let { val v = musicVolume(); it.setVolume(v, v) }
+        }
+
+    /** 설정창의 효과음 크기 (0~100). 다음에 나는 효과음부터 적용됨 */
+    var effectLevel: Int = prefs.getInt(KEY_EFFECT_LEVEL, MAX_LEVEL).coerceIn(0, MAX_LEVEL)
+        set(value) {
+            field = value.coerceIn(0, MAX_LEVEL)
+            prefs.edit().putInt(KEY_EFFECT_LEVEL, field).apply()
+        }
+
+    private fun musicVolume() =
+        (GameAudioConfig.MUSIC_VOLUME * musicLevel / MAX_LEVEL).coerceIn(0f, 1f)
+
     private var musicOwner: Any? = null
     private var musicPrepared = false
     private var musicRequested = false
@@ -122,7 +143,7 @@ internal class GameAudioManager private constructor(private val context: Context
         if (previous != null && now - previous < effect.cooldownMs) return
 
         streams.remove(sound)?.let { pool.stop(it) }
-        val volume = (GameAudioConfig.EFFECT_VOLUME * effect.volume).coerceIn(0f, 1f)
+        val volume = (GameAudioConfig.EFFECT_VOLUME * effect.volume * effectLevel / MAX_LEVEL).coerceIn(0f, 1f)
         val stream = pool.play(sampleId, volume, volume, effect.priority, 0, 1f)
         if (stream != 0) {
             streams[sound] = stream
@@ -151,7 +172,7 @@ internal class GameAudioManager private constructor(private val context: Context
                 if (prepared === music) {
                     musicPrepared = true
                     prepared.isLooping = true
-                    val volume = GameAudioConfig.MUSIC_VOLUME.coerceIn(0f, 1f)
+                    val volume = musicVolume()
                     prepared.setVolume(volume, volume)
                     if (musicRequested) prepared.start()
                 }
@@ -190,6 +211,10 @@ internal class GameAudioManager private constructor(private val context: Context
 
     companion object {
         private const val TAG = "GameAudio"
+        private const val PREFS_NAME = "game_settings"
+        private const val KEY_MUSIC_LEVEL = "music_level"
+        private const val KEY_EFFECT_LEVEL = "effect_level"
+        const val MAX_LEVEL = 100
         private var instance: GameAudioManager? = null
 
         fun from(context: Context): GameAudioManager {

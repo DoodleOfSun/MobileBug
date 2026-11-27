@@ -15,6 +15,7 @@ import android.view.Choreographer
 import android.view.Surface
 import android.view.View
 import android.view.Window
+import android.view.WindowManager
 import android.widget.ImageButton
 import android.widget.ProgressBar
 import android.widget.SeekBar
@@ -127,8 +128,16 @@ abstract class BaseGameActivity : AudioActivity(), SensorEventListener {
             dialog.setContentView(settingsXML)
             dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
             dialog.window?.setLayout(dpToPx(550f), dpToPx(330f))
+            // 카메라 구멍 영역까지 화면 전체 기준으로 가운데 정렬 (게임 화면과 같은 기준)
+            dialog.window?.let { window ->
+                window.attributes = window.attributes.apply {
+                    layoutInDisplayCutoutMode =
+                        WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALWAYS
+                }
+            }
 
             seekBar.progress = sensitivity.toInt()
+            setupVolumeBars(settingsXML)
 
             btnClose.setGameClickListener(::playSound) {
                 sensitivity = seekBar.progress.toFloat()
