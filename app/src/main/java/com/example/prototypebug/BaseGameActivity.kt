@@ -23,6 +23,7 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import kotlin.math.atan2
+import kotlin.math.pow
 
 abstract class BaseGameActivity : AudioActivity(), SensorEventListener {
 
@@ -163,6 +164,14 @@ abstract class BaseGameActivity : AudioActivity(), SensorEventListener {
         sensorManager.unregisterListener(this)
     }
 
+    // 수정: 액티비티가 끝난 뒤에도 게임 루프가 계속 다음 프레임을 예약하던 문제 방지
+    override fun onDestroy() {
+        if (::gameLoop.isInitialized) {
+            Choreographer.getInstance().removeFrameCallback(gameLoop)
+        }
+        super.onDestroy()
+    }
+
     override fun onSensorChanged(event: SensorEvent?) {
         if (isPaused || !isBlockMurdererStarted) return
         if (event == null || event.sensor.type != Sensor.TYPE_ACCELEROMETER) return
@@ -178,15 +187,30 @@ abstract class BaseGameActivity : AudioActivity(), SensorEventListener {
             else -> rawX to rawY
         }
 
-        velX += mappedX * sensitivity * 0.05f
-        velY += -mappedY * sensitivity * 0.05f
-        velX *= damping
-        velY *= damping
+        // 수정: 센서에서는 기울기만 저장하고, 실제 이동은 게임 루프의 updatePlayerMovement 에서 한다.
+        // (센서 이벤트 주기는 기기마다 50~200Hz 로 달라서, 여기서 움직이면 기기마다 속도가 달라짐)
+        tiltX = mappedX
+        tiltY = mappedY
+    }
+
+    // 최근 센서 기울기 값
+    private var tiltX = 0f
+    private var tiltY = 0f
+
+    // 60fps 한 프레임 기준으로 예전과 같은 물리를 deltaTime 에 맞춰 적용
+    private fun updatePlayerMovement(deltaTime: Float) {
+        val frameScale = deltaTime * 60f
+
+        velX += tiltX * sensitivity * 0.05f * frameScale
+        velY += -tiltY * sensitivity * 0.05f * frameScale
+        val decay = damping.pow(frameScale)
+        velX *= decay
+        velY *= decay
 
         val previousX = playerInfo.x
         val previousY = playerInfo.y
-        playerInfo.x += velX
-        playerInfo.y += velY
+        playerInfo.x += velX * frameScale
+        playerInfo.y += velY * frameScale
 
         val maxX = (container.width - playerInfo.playerSprite.width).coerceAtLeast(0).toFloat()
         val maxY = (container.height - playerInfo.playerSprite.height).coerceAtLeast(0).toFloat()
@@ -227,7 +251,9 @@ abstract class BaseGameActivity : AudioActivity(), SensorEventListener {
             if (lastFrameTimeNanos == 0L) {
                 lastFrameTimeNanos = frameTimeNanos
             } else {
-                deltaTime = (frameTimeNanos - lastFrameTimeNanos) / 1_000_000_000f
+                // 수정: 앱이 백그라운드에 갔다 오거나 큰 렉이 걸렸을 때 deltaTime 이 몇 초씩 튀어서
+                // 적/탄/무기가 순간이동하지 않도록 한 프레임 최대 0.1초로 제한
+                deltaTime = ((frameTimeNanos - lastFrameTimeNanos) / 1_000_000_000f).coerceAtMost(0.1f)
                 lastFrameTimeNanos = frameTimeNanos
             }
 
@@ -249,13 +275,15 @@ abstract class BaseGameActivity : AudioActivity(), SensorEventListener {
                     secTime -= monsterSpawnTimeDelay
                 }
 
+                updatePlayerMovement(deltaTime)
                 enemySpawner.updateAll(playerInfo, deltaTime)
                 weaponManager.updateAll(deltaTime, playerInfo, enemySpawner.enemies)
                 rewardJewels.update(playerInfo, deltaTime)
                 updateHPBarValue()
 
+                // 수정: 승리와 사망이 같은 프레임에 겹치면 결과 화면이 두 번 뜨던 문제 방지
                 if (gameTime >= winTime) winGame()
-                if (playerInfo.checkPlayerDied()) {
+                else if (playerInfo.checkPlayerDied()) {
                     isBlockMurdererStarted = false
                     endGame()
                 }
@@ -268,17 +296,12 @@ abstract class BaseGameActivity : AudioActivity(), SensorEventListener {
                     deltaTime
                 )
 
-                val toRemove = mutableListOf<Enemy>()
-
+                // 수정: 피격 쿨타임은 PlayerNormalAttack.tryHit 안에서 처리 (매 프레임 피해 방지)
+                // 수정: 보석은 아래 "죽은 적 제거" 루프에서만 생성 (중복 드랍 방지)
                 enemySpawner.enemies.forEach { enemy ->
-                    if (playerNormalAttack.checkCollision(enemy.getCenterX(), enemy.getCenterY(), enemy.radius)) {
-                        enemy.takeDamage(playerNormalAttack.attackPower)
-                        if (enemy.health <= 0f) {
-                            playSound(GameSound.ENEMY_DEFEATED)
-                            rewardJewels.spawn(enemy.getCenterX(), enemy.getCenterY())
-                            onNormalAttackKill(enemy)
-                            toRemove.add(enemy)
-                        }
+                    if (playerNormalAttack.tryHit(enemy) && enemy.health <= 0f) {
+                        playSound(GameSound.ENEMY_DEFEATED)
+                        onNormalAttackKill(enemy)
                     }
                 }
 
@@ -288,6 +311,8 @@ abstract class BaseGameActivity : AudioActivity(), SensorEventListener {
                 enemySpawner.enemies.forEach { enemy ->
                     if (enemy.health <= 0f) {
                         rewardJewels.spawn(enemy.getCenterX(), enemy.getCenterY())
+                        // 수정: 어떤 무기로 죽였든 처치 수를 센다 (점수 계산용)
+                        if (enemy is Boss || enemy is RangedBoss) bossKillCount++ else enemyKillCount++
                         deadEnemies.add(enemy)
                     }
                 }

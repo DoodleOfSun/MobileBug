@@ -21,15 +21,19 @@ class RingWeapon(
     override fun update(deltaTime: Float, player: PlayerInfo, enemies: List<Enemy>) {
         timer += deltaTime
 
-        if (timer >= interval && enemies.isNotEmpty()) {
-            timer = 0f
-            Log.d("RingDebug", "공격 실행 - level: $level, 대상 수: ${enemies.shuffled().take(level).size}")
-            attackRandomEnemies(enemies)
+        // 수정: 이미 죽은(health <= 0) 적은 대상에서 제외
+        if (timer >= interval) {
+            val alive = enemies.filter { it.health > 0f }
+            if (alive.isNotEmpty()) {
+                timer = 0f
+                attackRandomEnemies(alive)
+            }
         }
     }
 
     private fun attackRandomEnemies(enemies: List<Enemy>) {
         val targets = enemies.shuffled().take(level)
+        Log.d("RingDebug", "공격 실행 - level: $level, 대상 수: ${targets.size}")
         targets.forEach { target ->
             target.takeDamage(damage)
             showLightningEffect(target)

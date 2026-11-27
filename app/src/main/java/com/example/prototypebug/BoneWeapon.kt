@@ -20,6 +20,9 @@ class BoneWeapon(
 
     private val damage = 100f
 
+    // 수정: 같은 적은 뼈 하나당 이 시간(초)에 한 번만 맞는다.
+    private val hitCooldown = 0.5f
+
     private val boneSize = 120
 
     override fun update(deltaTime: Float, player: PlayerInfo, enemies: List<Enemy>) {
@@ -48,9 +51,21 @@ class BoneWeapon(
             bone.sprite.x = bone.x
             bone.sprite.y = bone.y
 
+            // 쿨타임 감소 + 끝났거나 사라진 적은 정리
+            val iterator = bone.hitCooldowns.entries.iterator()
+            while (iterator.hasNext()) {
+                val entry = iterator.next()
+                entry.setValue(entry.value - deltaTime)
+                if (entry.value <= 0f || entry.key !in enemies) iterator.remove()
+            }
+
             enemies.forEach { enemy ->
-                if (checkCollision(bone, enemy)) {
+                if (enemy.health > 0f &&
+                    enemy !in bone.hitCooldowns &&
+                    checkCollision(bone, enemy)
+                ) {
                     enemy.takeDamage(damage)
+                    bone.hitCooldowns[enemy] = hitCooldown
                 }
             }
         }
@@ -92,12 +107,16 @@ class BoneWeapon(
         var y = 0f
         var velX = 0f
         var velY = 0f
-        val size = 40f
-        val radius = 60f
+        // 수정: 스프라이트 크기(boneSize = 120px)와 맞춤. 예전엔 40 이라 오른쪽/아래 벽을 80px 뚫고 나갔음
+        val size = 120f
+        val radius = size / 2f
 
         var rotation = 0f
 
         val rotationSpeed = 360f
+
+        // 적 → 남은 피격 쿨타임(초). Enemy 는 일반 class 라 키 비교는 객체 동일성 기준.
+        val hitCooldowns = mutableMapOf<Enemy, Float>()
 
         lateinit var sprite: ImageView
 

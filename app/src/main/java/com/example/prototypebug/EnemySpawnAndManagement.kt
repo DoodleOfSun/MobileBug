@@ -197,7 +197,7 @@ class EnemySpawnAndManagement(
             val dy = player.getCenterY() - bullet.y
             val hit = sqrt(dx * dx + dy * dy) < player.radius + bullet.radius
             val out = bullet.x < -50f || bullet.x > width + 50f ||
-                      bullet.y < -50f || bullet.y > height + 50f
+                    bullet.y < -50f || bullet.y > height + 50f
 
             if (hit && !blocked) player.playerGetDamaged(bullet.damage)
 
@@ -216,14 +216,27 @@ class EnemySpawnAndManagement(
         val cover = map2Cover
         val playerX = player.getCenterX()
         val playerY = player.getCenterY()
+        val frameScale = deltaTime * 60f // 수정: 60fps 한 프레임 = 1
         enemies.forEach { enemy ->
+            enemy.frameScale = frameScale
             val previousX = enemy.x
             val previousY = enemy.y
-            val waypoint = cover?.detour(enemy.getCenterX(), enemy.getCenterY(), playerX, playerY, enemy.radius)
+
+            // 블랙홀에 끌려가는 중이면 목표를 블랙홀 중심으로 (한 프레임 쓰고 비움)
+            val pulled = enemy.overrideTargetX != null && enemy.overrideTargetY != null
+            val targetX = if (pulled) enemy.overrideTargetX!! else playerX
+            val targetY = if (pulled) enemy.overrideTargetY!! else playerY
+            enemy.overrideTargetX = null
+            enemy.overrideTargetY = null
+
+            val waypoint = cover?.detour(enemy.getCenterX(), enemy.getCenterY(), targetX, targetY, enemy.radius)
             if (enemy is RangedEnemy && waypoint != null) {
                 enemy.moveToward(waypoint.x, waypoint.y, detouring = true)
+            } else if (enemy is RangedEnemy && pulled) {
+                // 원거리 몹은 사거리 안이면 멈추는데, 끌려갈 때는 멈추지 않고 블랙홀로 이동
+                enemy.moveToward(targetX, targetY, detouring = true)
             } else {
-                enemy.update(playerX, playerY)
+                enemy.update(targetX, targetY)
             }
             cover?.constrainEnemy(enemy, previousX, previousY)
         }

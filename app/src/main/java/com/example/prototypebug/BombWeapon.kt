@@ -1,7 +1,6 @@
 package com.example.prototypebug
 
 import android.content.Context
-import android.util.Log
 import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintLayout
 import kotlin.math.sqrt
@@ -28,22 +27,15 @@ class BombWeapon(
     ) {
 
         lateinit var sprite: ImageView
-        val radius = 30f
+        // 수정: 스프라이트 크기(bombSize = 120px)의 절반. 예전엔 30 이라 폭발이 왼쪽 위로 30px 어긋났음
+        val radius = 60f
         fun getCenterX() = x + radius
         fun getCenterY() = y + radius
     }
 
     override fun update(deltaTime: Float, player: PlayerInfo, enemies: List<Enemy>) {
+        // 수정: timer 를 한 프레임에 한 번만 증가시키고, 스폰 체크도 한 번만 한다.
         timer += deltaTime
-
-        Log.d("Bomb", "update 호출됨, timer: $timer, bombs: ${bombs.size}")
-        timer += deltaTime
-
-        if (timer >= spawnInterval) {
-            Log.d("Bomb", "spawn 조건 충족")
-            timer = 0f
-            spawnBomb(player)
-        }
 
         if (timer >= spawnInterval) {
             timer = 0f

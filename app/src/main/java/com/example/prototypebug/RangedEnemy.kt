@@ -27,8 +27,8 @@ open class RangedEnemy : Enemy() {
     // 화면 안에 완전히 들어와 있나?
     fun isOnScreen(): Boolean {
         return x >= 0f && y >= 0f &&
-               x + radius * 2 <= screenWidth &&
-               y + radius * 2 <= screenHeight
+                x + radius * 2 <= screenWidth &&
+                y + radius * 2 <= screenHeight
     }
 
     // 플레이어가 사거리 안에 있나?
@@ -49,7 +49,8 @@ open class RangedEnemy : Enemy() {
         val dist = sqrt(dx * dx + dy * dy)
 
         if (dist > 1f && (detouring || dist > attackRange || !isOnScreen())) {
-            val step = if (detouring) minOf(moveSpeed, dist) else moveSpeed
+            // 수정: moveSpeed → frameStep (프레임 속도와 무관하게 이동)
+            val step = if (detouring) minOf(frameStep, dist) else frameStep
             x += dx / dist * step
             y += dy / dist * step
         }
