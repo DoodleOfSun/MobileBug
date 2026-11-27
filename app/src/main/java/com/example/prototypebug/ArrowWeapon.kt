@@ -33,23 +33,27 @@ class ArrowWeapon(
     private fun launch(player: PlayerInfo, enemies: List<Enemy>) {
         val playerX = player.getCenterX()
         val playerY = player.getCenterY()
-        val target = enemies.asSequence().filter { it.health > 0f }.minByOrNull { enemy ->
+        // 수정: 레벨만큼 발사 (최대 3발). 가까운 적부터 서로 다른 적을 하나씩 노린다 (적이 더 적으면 그 수만큼만)
+        val targets = enemies.filter { it.health > 0f }.sortedBy { enemy ->
             val dx = enemy.getCenterX() - playerX
             val dy = enemy.getCenterY() - playerY
             dx * dx + dy * dy
-        } ?: return
+        }.take(level.coerceAtMost(3))
+        if (targets.isEmpty()) return
 
         cooldown = 1.2f
-        val projectile = WeaponProjectile(
-            arena,
-            type.iconRes,
-            Color.rgb(175, 250, 100),
-            playerX,
-            playerY,
-            sizeDp = 22f,
-            damage = 12f + (level - 1) * 3f
-        )
-        arrows.add(Flight(projectile, target))
+        for (target in targets) {
+            val projectile = WeaponProjectile(
+                arena,
+                type.iconRes,
+                Color.rgb(175, 250, 100),
+                playerX,
+                playerY,
+                sizeDp = 22f,
+                damage = 12f + (level - 1) * 3f
+            )
+            arrows.add(Flight(projectile, target))
+        }
     }
 
     private fun advance(flight: Flight, deltaTime: Float, enemies: List<Enemy>): Boolean {

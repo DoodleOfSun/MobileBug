@@ -51,23 +51,29 @@ class SickleWeapon(
     }
 
     private fun launch(player: PlayerInfo) {
-        val angle = Random.nextDouble(0.0, 2.0 * Math.PI)
-        val sprite = ImageView(arena.context).apply {
-            layoutParams = ConstraintLayout.LayoutParams(sizePx, sizePx)
-            setImageResource(type.iconRes)   // 색 덧씌우기 없음 (원래 이미지 색 그대로)
-            importantForAccessibility = ImageView.IMPORTANT_FOR_ACCESSIBILITY_NO
-        }
-        arena.addView(sprite)
+        // 레벨만큼 발사 (최대 3개). 랜덤 방향 하나를 기준으로 나머지는 같은 간격으로 나눠서 퍼짐
+        // (2개 = 정반대 방향, 3개 = 120도 간격)
+        val count = level.coerceAtMost(3)
+        val baseAngle = Random.nextDouble(0.0, 2.0 * Math.PI)
+        for (i in 0 until count) {
+            val angle = baseAngle + i * (2.0 * Math.PI / count)
+            val sprite = ImageView(arena.context).apply {
+                layoutParams = ConstraintLayout.LayoutParams(sizePx, sizePx)
+                setImageResource(type.iconRes)   // 색 덧씌우기 없음 (원래 이미지 색 그대로)
+                importantForAccessibility = ImageView.IMPORTANT_FOR_ACCESSIBILITY_NO
+            }
+            arena.addView(sprite)
 
-        val sickle = FlyingSickle(
-            sprite,
-            player.getCenterX(),
-            player.getCenterY(),
-            cos(angle).toFloat() * speed,
-            sin(angle).toFloat() * speed
-        )
-        render(sickle)
-        sickles.add(sickle)
+            val sickle = FlyingSickle(
+                sprite,
+                player.getCenterX(),
+                player.getCenterY(),
+                cos(angle).toFloat() * speed,
+                sin(angle).toFloat() * speed
+            )
+            render(sickle)
+            sickles.add(sickle)
+        }
     }
 
     // 관통: 겹친 적은 전부 맞되, 같은 적은 한 번만

@@ -36,27 +36,33 @@ class DaggerWeapon(
     }
 
     private fun launch(player: PlayerInfo) {
-        val heading = player.playerSprite.rotation
-        val radians = Math.toRadians(heading.toDouble())
-        val projectile = WeaponProjectile(
-            arena = arena,
-            iconRes = type.iconRes,
-            tint = Color.rgb(232, 218, 255),
-            startX = player.getCenterX(),
-            startY = player.getCenterY(),
-            sizeDp = 24f,
-            damage = 9f + 3f * (level - 1)
-        )
-        daggers.add(
-            FlyingDagger(
-                projectile,
-                cos(radians).toFloat() * speed,
-                sin(radians).toFloat() * speed,
-                // The dagger image points 45 degrees above the positive X axis.
-                heading + 45f
+        // 수정: 레벨만큼 발사 (최대 3발). 이동 방향을 중심으로 spreadDegrees 간격 부채꼴로 퍼짐
+        val count = level.coerceAtMost(3)
+        for (i in 0 until count) {
+            val heading = player.playerSprite.rotation + (i - (count - 1) / 2f) * spreadDegrees
+            val radians = Math.toRadians(heading.toDouble())
+            val projectile = WeaponProjectile(
+                arena = arena,
+                iconRes = type.iconRes,
+                tint = Color.rgb(232, 218, 255),
+                startX = player.getCenterX(),
+                startY = player.getCenterY(),
+                sizeDp = 24f,
+                damage = 9f + 3f * (level - 1)
             )
-        )
+            daggers.add(
+                FlyingDagger(
+                    projectile,
+                    cos(radians).toFloat() * speed,
+                    sin(radians).toFloat() * speed,
+                    // The dagger image points 45 degrees above the positive X axis.
+                    heading + 45f
+                )
+            )
+        }
     }
+
+    private val spreadDegrees = 12f
 
     override fun onLevelUp() {}
 
