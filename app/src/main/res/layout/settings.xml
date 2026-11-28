@@ -66,12 +66,15 @@
         app:layout_constraintTop_toTopOf="@id/settingsTitleBand" />
 
     <!-- 닫기 버튼 (코드에서 사용하는 id 그대로) -->
+
+    <!-- SENSITIVITY 글자 -->
+
     <ImageButton
         android:id="@+id/btnSettingClose"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginEnd="12dp"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="28dp"
         android:background="@android:color/transparent"
         android:contentDescription="@string/closebutton"
         android:padding="6dp"
@@ -80,7 +83,6 @@
         app:layout_constraintEnd_toEndOf="@id/settingsPanel"
         app:layout_constraintTop_toTopOf="@id/settingsPanel" />
 
-    <!-- SENSITIVITY 글자 -->
     <TextView
         android:id="@+id/settingsSensitivityText"
         android:layout_width="wrap_content"

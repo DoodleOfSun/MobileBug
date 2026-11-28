@@ -22,6 +22,9 @@ class EnemySpawnAndManagement(
 
     private var monsterDamageDelay = 2f
 
+    // 수정: 생성되는 몬스터 체력 계산용 플레이어 레벨 (BaseGameActivity 가 웨이브마다 넣어줌)
+    var playerLevel = 0
+
     val enemies = mutableListOf<Enemy>()
     val bullets = mutableListOf<EnemyBullet>()
     var playerAndEnemyCollisionSecTimer = monsterDamageDelay
@@ -37,6 +40,8 @@ class EnemySpawnAndManagement(
         container.addView(enemyView)
 
         val enemy = Enemy()
+        enemy.maxHealth = GameBalance.enemyHealth(playerLevel)
+        enemy.health = enemy.maxHealth
         enemy.x = x
         enemy.y = y
         enemy.enemySprite = enemyView
@@ -65,6 +70,8 @@ class EnemySpawnAndManagement(
         container.addView(enemyView)
 
         val boss = Boss()
+        boss.maxHealth = GameBalance.bossHealth(playerLevel)
+        boss.health = boss.maxHealth
         boss.radius = bossSizePx / 2f
         boss.x = spawnX
         boss.y = spawnY
@@ -96,6 +103,8 @@ class EnemySpawnAndManagement(
         container.addView(enemyView)
 
         val boss = RangedBoss()
+        boss.maxHealth = GameBalance.bossHealth(playerLevel)
+        boss.health = boss.maxHealth
         boss.radius = bossSizePx / 2f
         boss.x = spawnX
         boss.y = spawnY
@@ -142,6 +151,8 @@ class EnemySpawnAndManagement(
         container.addView(view)
 
         val ranged = RangedEnemy()
+        ranged.maxHealth = GameBalance.rangedEnemyHealth(playerLevel)
+        ranged.health = ranged.maxHealth
         ranged.radius = 30f
         ranged.x = centerX + (spawnRadius * cos(angle)).toFloat()
         ranged.y = centerY + (spawnRadius * sin(angle)).toFloat()

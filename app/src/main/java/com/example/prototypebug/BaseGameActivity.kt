@@ -15,15 +15,16 @@ import android.view.Choreographer
 import android.view.Surface
 import android.view.View
 import android.view.Window
-import android.view.WindowManager
 import android.widget.ImageButton
 import android.widget.ProgressBar
 import android.widget.SeekBar
+import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import kotlin.math.atan2
+import kotlin.math.ceil
 import kotlin.math.pow
 
 abstract class BaseGameActivity : AudioActivity(), SensorEventListener {
@@ -43,6 +44,10 @@ abstract class BaseGameActivity : AudioActivity(), SensorEventListener {
     protected val damping = 0.9f
 
     protected lateinit var playerHPBar: ProgressBar
+
+    // 수정: 남은 시간 표시 (레이아웃에 timerText 가 없으면 null 이라 아무것도 안 함)
+    protected var timerText: TextView? = null
+    private var lastShownSeconds = -1
     protected lateinit var playerNormalAttack: PlayerNormalAttack
 
     protected var isBlockMurdererStarted = false
@@ -83,6 +88,8 @@ abstract class BaseGameActivity : AudioActivity(), SensorEventListener {
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
 
         playerHPBar = findViewById(R.id.progressBar_playerHP)
+        timerText = findViewById(R.id.timerText)
+        updateTimerText()
         playerHPBar.visibility = View.INVISIBLE
         playerHPBar.progress = 100
 
@@ -129,16 +136,8 @@ abstract class BaseGameActivity : AudioActivity(), SensorEventListener {
             dialog.setContentView(settingsXML)
             dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
             dialog.window?.setLayout(dpToPx(550f), dpToPx(330f))
-            // 카메라 구멍 영역까지 화면 전체 기준으로 가운데 정렬 (게임 화면과 같은 기준)
-            dialog.window?.let { window ->
-                window.attributes = window.attributes.apply {
-                    layoutInDisplayCutoutMode =
-                        WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALWAYS
-                }
-            }
 
             seekBar.progress = sensitivity.toInt()
-            setupVolumeBars(settingsXML)
 
             btnClose.setGameClickListener(::playSound) {
                 sensitivity = seekBar.progress.toFloat()
@@ -271,9 +270,11 @@ abstract class BaseGameActivity : AudioActivity(), SensorEventListener {
             } else {
                 secTime += deltaTime
                 gameTime += deltaTime
+                updateTimerText()
 
                 if (secTime >= monsterSpawnTimeDelay) {
                     waveCount++
+                    enemySpawner.playerLevel = playerInfo.playerLevel  // 수정: 레벨에 맞는 체력으로 생성
                     if (this is Map2Activity) {
                         repeat(9) { enemySpawner.spawnRangedFromEdge() }               // Map2: 원거리
                         if (waveCount % 10 == 0) enemySpawner.spawnRangedBoss()        // Map2: 원거리 보스
@@ -372,6 +373,14 @@ abstract class BaseGameActivity : AudioActivity(), SensorEventListener {
 
         playerHPBar.progress = percent
     }
+    // 수정: 남은 시간을 "분:초"로 표시. 초가 바뀔 때만 글자를 갱신
+    protected fun updateTimerText() {
+        val remaining = ceil(winTime - gameTime).toInt().coerceAtLeast(0)
+        if (remaining == lastShownSeconds) return
+        lastShownSeconds = remaining
+        timerText?.text = "${remaining / 60}:${(remaining % 60).toString().padStart(2, '0')}"
+    }
+
     fun setPause(data: Boolean) { isPaused = data }
 
     fun dpToPx(dp: Float): Int = (dp * resources.displayMetrics.density).toInt()

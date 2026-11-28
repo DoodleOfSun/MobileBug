@@ -57,7 +57,7 @@ class AxeWeapon(
 
         cooldown -= deltaTime
         if (cooldown <= 0f) {
-            cooldown = (1.8f / level).coerceAtLeast(0.25f)
+            cooldown = (3.6f / level).coerceAtLeast(0.4f)  // 하향: 1.8/Lv(최소 0.25) → 3.6/Lv(최소 0.4)
             val facingX = cos(Math.toRadians(player.playerSprite.rotation.toDouble())).toFloat()
             // 수정: 레벨만큼 던진다 (최대 3개)
             val count = level.coerceAtMost(3)

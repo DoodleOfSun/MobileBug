@@ -19,7 +19,7 @@ class BoneWeapon(
     private var spawnTimer = 0f
     private val spawnDelay = 1.2f
 
-    private val damage = 100f
+    private val damage get() = 30f + 6f * (level - 1)  // 하향: 100 고정 → 30 + 6×(Lv-1)
 
     // 수정: 같은 적은 뼈 하나당 이 시간(초)에 한 번만 맞는다.
     private val hitCooldown = 0.5f

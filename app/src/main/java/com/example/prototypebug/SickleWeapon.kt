@@ -33,7 +33,7 @@ class SickleWeapon(
     override fun update(deltaTime: Float, player: PlayerInfo, enemies: List<Enemy>) {
         cooldown -= deltaTime
         if (cooldown <= 0f) {
-            cooldown = 1.0f / level
+            cooldown = 2.0f / level  // 하향: 1/Lv → 2/Lv
             launch(player)
         }
 

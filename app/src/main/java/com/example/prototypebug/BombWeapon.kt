@@ -79,8 +79,8 @@ class BombWeapon(
     }
 
     private fun explode(bomb: Bomb, enemies: List<Enemy>) {
-        val explodeRadius = 200f + (level - 1) * 100f
-        val damage = 40f + (level - 1) * 15f
+        val explodeRadius = 200f + (level - 1) * 40f  // 하향: 레벨당 +100 → +40
+        val damage = 40f + (level - 1) * 8f           // 하향: 레벨당 +15 → +8
 
         enemies.forEach { enemy ->
             val dx = bomb.getCenterX() - enemy.getCenterX()

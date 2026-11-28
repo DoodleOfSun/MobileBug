@@ -23,7 +23,11 @@ class PlayerInfo internal constructor(private val playSound: (GameSound) -> Unit
 
     var playerExp : Float = 0f
 
-    var playerExpScale = 0.3f
+    // 수정: 레벨업 횟수 (게임 시작 시 0). 몬스터 체력 계산에 씀
+    var playerLevel = 0
+
+    // 수정: 다음 레벨업까지 필요한 경험치. 레벨마다 GameBalance 에서 다시 계산
+    var playerExpScale = GameBalance.expToNextLevel(0)
 
     fun playerReset(){
         x = 0f
@@ -88,6 +92,8 @@ class PlayerInfo internal constructor(private val playSound: (GameSound) -> Unit
         // (0.01 을 30번 더해도 float 오차로 0.2999.. 가 될 수 있어 작은 여유값을 둠)
         while (playerExp >= playerExpScale - 0.0001f) {
             playerExp -= playerExpScale
+            playerLevel++
+            playerExpScale = GameBalance.expToNextLevel(playerLevel)
             pendingLevelUps++
         }
         showNextLevelUp(cont)
