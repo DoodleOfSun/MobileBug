@@ -1,6 +1,7 @@
 package com.example.prototypebug
 
 import android.content.Context
+import android.graphics.Color
 import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintLayout
 import kotlin.math.cos
@@ -76,6 +77,7 @@ class BoneWeapon(
         val size = boneSize
         boneView.layoutParams = ConstraintLayout.LayoutParams(size, size)
         boneView.setImageResource(R.drawable.bone)
+        boneView.setColorFilter(Color.WHITE)  // 하얀색
         container.addView(boneView)
 
         val bone = Bone()

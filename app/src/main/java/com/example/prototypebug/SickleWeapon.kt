@@ -1,5 +1,6 @@
 package com.example.prototypebug
 
+import android.graphics.Color
 import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintLayout
 import kotlin.math.cos
@@ -59,7 +60,8 @@ class SickleWeapon(
             val angle = baseAngle + i * (2.0 * Math.PI / count)
             val sprite = ImageView(arena.context).apply {
                 layoutParams = ConstraintLayout.LayoutParams(sizePx, sizePx)
-                setImageResource(type.iconRes)   // 색 덧씌우기 없음 (원래 이미지 색 그대로)
+                setImageResource(type.iconRes)
+                setColorFilter(Color.rgb(230, 60, 60))   // 빨간색
                 importantForAccessibility = ImageView.IMPORTANT_FOR_ACCESSIBILITY_NO
             }
             arena.addView(sprite)

@@ -1,6 +1,7 @@
 package com.example.prototypebug
 
 import android.content.Context
+import android.graphics.Color
 import android.util.Log
 import android.view.ViewGroup
 import android.widget.ImageView
@@ -46,6 +47,7 @@ class RingWeapon(
 
         lightning.layoutParams = ConstraintLayout.LayoutParams(size, size)
         lightning.setImageResource(R.drawable.lightningbolt)
+        lightning.setColorFilter(Color.rgb(255, 220, 40))  // 노란색
         lightning.alpha = 1f
 
         // 적의 머리 바로 위에 배치

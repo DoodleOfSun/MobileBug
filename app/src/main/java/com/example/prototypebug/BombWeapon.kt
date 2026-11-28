@@ -1,6 +1,7 @@
 package com.example.prototypebug
 
 import android.content.Context
+import android.graphics.Color
 import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintLayout
 import kotlin.math.sqrt
@@ -63,6 +64,7 @@ class BombWeapon(
 
         bombView.layoutParams = ConstraintLayout.LayoutParams(size, size)
         bombView.setImageResource(R.drawable.bomb)  // 폭탄 이미지
+        bombView.setColorFilter(Color.rgb(60, 120, 255))  // 파란색
 
         val bomb = Bomb(
             x = player.getCenterX() - size / 2f,
@@ -100,6 +102,7 @@ class BombWeapon(
 
         explosion.layoutParams = ConstraintLayout.LayoutParams(size, size)
         explosion.setImageResource(R.drawable.explosion)  // 폭발 이미지
+        explosion.setColorFilter(Color.rgb(255, 140, 0))  // 주황색
         explosion.x = bomb.getCenterX() - size / 2f
         explosion.y = bomb.getCenterY() - size / 2f
 

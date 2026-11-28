@@ -1,5 +1,6 @@
 package com.example.prototypebug
 
+import android.graphics.Color
 import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintLayout
 
@@ -9,7 +10,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
  *
  * 필요한 이미지:
  *  - R.drawable.missile_target    : 착탄 범위 표시
- *  - R.drawable.missile_explosion : 폭발
+ *  - R.drawable.explosion         : 폭발 (폭탄과 공용)
  *  - 떨어지는 미사일은 기존 아이콘(R.drawable.missile)을 사용
  */
 class MissileWeapon(
@@ -103,7 +104,8 @@ class MissileWeapon(
         val size = (blastRadius * 2f).toInt()
         val explosion = ImageView(arena.context).apply {
             layoutParams = ConstraintLayout.LayoutParams(size, size)
-            setImageResource(R.drawable.missile_explosion)   // 폭발 이미지
+            setImageResource(R.drawable.explosion)   // 폭발 이미지 (폭탄과 공용)
+            setColorFilter(Color.rgb(255, 140, 0))   // 주황색
             this.x = x - size / 2f
             this.y = y - size / 2f
             importantForAccessibility = ImageView.IMPORTANT_FOR_ACCESSIBILITY_NO
