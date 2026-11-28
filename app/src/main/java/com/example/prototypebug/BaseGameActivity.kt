@@ -130,6 +130,7 @@ abstract class BaseGameActivity : AudioActivity(), SensorEventListener {
             val settingsXML = layoutInflater.inflate(R.layout.settings, null)
             val btnClose = settingsXML.findViewById<ImageButton>(R.id.btnSettingClose)
             val seekBar = settingsXML.findViewById<SeekBar>(R.id.sensitivityBar)
+            setupVolumeBars(settingsXML)  // 수정: BGM·SFX 시크바를 저장된 값으로 맞추고, 움직이면 바로 적용
 
             val dialog = Dialog(this)
             dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)

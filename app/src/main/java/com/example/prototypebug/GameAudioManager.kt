@@ -37,13 +37,24 @@ private object GameAudioConfig {
 
 /** Used on the main thread. Keeps the application context and no Activity references. */
 internal class GameAudioManager private constructor(private val context: Context) {
-    private val attributes = AudioAttributes.Builder()
+    // 효과음용 AudioAttributes (USAGE_GAME + CONTENT_TYPE_SONIFICATION: 미디어 볼륨 스트림과 동기화 및 저지연 직출력)
+    private val sfxAttributes = AudioAttributes.Builder()
+        .setUsage(AudioAttributes.USAGE_GAME)
+        .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+        .build()
+
+    // 배경음(BGM)용 AudioAttributes (USAGE_GAME + CONTENT_TYPE_MUSIC)
+    private val musicAttributes = AudioAttributes.Builder()
         .setUsage(AudioAttributes.USAGE_GAME)
         .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
         .build()
 
     private var startedScreens = 0
-    private var soundPool: SoundPool? = null
+    private val soundPool: SoundPool = SoundPool.Builder()
+        .setMaxStreams(10)
+        .setAudioAttributes(sfxAttributes)
+        .build()
+
     private val sampleIds = mutableMapOf<Int, Int>()
     private val loadedSamples = mutableSetOf<Int>()
     private val pendingEffects = mutableSetOf<GameSound>()
@@ -51,7 +62,33 @@ internal class GameAudioManager private constructor(private val context: Context
     private val lastPlayed = mutableMapOf<GameSound, Long>()
 
     private var music: MediaPlayer? = null
+    private var currentMusicResource: Int? = null
     private val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+
+    init {
+        soundPool.setOnLoadCompleteListener { source, sampleId, status ->
+            if (source !== soundPool) return@setOnLoadCompleteListener
+            val waiting = pendingEffects.filter { sampleIds[GameAudioConfig.effects.getValue(it).resource] == sampleId }
+            pendingEffects.removeAll(waiting)
+            if (status == 0) {
+                loadedSamples.add(sampleId)
+                waiting.forEach(::play)
+            } else {
+                sampleIds.values.remove(sampleId)
+                Log.w(TAG, "SoundPool load failed for sample $sampleId (status $status)")
+            }
+        }
+
+        // 효과음 자원을 싱글톤 인스턴스 생성 시 1회 사전 로드하여 앱 실행 동안 상주시킴
+        for (resource in GameAudioConfig.effects.values.map { it.resource }.distinct()) {
+            val sampleId = soundPool.load(context, resource, 1)
+            if (sampleId != 0) {
+                sampleIds[resource] = sampleId
+            } else {
+                Log.w(TAG, "SoundPool could not load resource $resource")
+            }
+        }
+    }
 
     /** 설정창의 배경음 크기 (0~100). 앱 전체 공용이라 어느 화면에서 바꿔도 똑같이 적용되고 저장됨 */
     var musicLevel: Int = prefs.getInt(KEY_MUSIC_LEVEL, MAX_LEVEL).coerceIn(0, MAX_LEVEL)
@@ -77,60 +114,22 @@ internal class GameAudioManager private constructor(private val context: Context
     private var musicRequested = false
 
     fun screenStarted() {
-        if (++startedScreens != 1) return
-
-        val pool = SoundPool.Builder().setMaxStreams(5).setAudioAttributes(attributes).build()
-        soundPool = pool
-        pool.setOnLoadCompleteListener { source, sampleId, status ->
-            if (source !== soundPool) return@setOnLoadCompleteListener
-            val waiting = pendingEffects.filter { sampleIds[GameAudioConfig.effects.getValue(it).resource] == sampleId }
-            pendingEffects.removeAll(waiting)
-            if (status == 0) {
-                loadedSamples.add(sampleId)
-                waiting.forEach(::play)
-            } else {
-                sampleIds.values.remove(sampleId)
-                Log.w(TAG, "SoundPool load failed for sample $sampleId (status $status)")
-            }
-        }
-
-        for (resource in GameAudioConfig.effects.values.map { it.resource }.distinct()) {
-            val sampleId = pool.load(context, resource, 1)
-            if (sampleId != 0) {
-                sampleIds[resource] = sampleId
-            } else {
-                Log.w(TAG, "SoundPool could not load resource $resource")
-            }
-        }
+        startedScreens++
     }
 
     fun screenPaused() {
         pendingEffects.clear()
-        // Let a short navigation click finish while another app screen is opening.
-        val iterator = streams.iterator()
-        while (iterator.hasNext()) {
-            val (sound, stream) = iterator.next()
-            if (sound != GameSound.BUTTON_CLICK) {
-                soundPool?.stop(stream)
-                iterator.remove()
-            }
-        }
     }
 
     fun screenStopped() {
-        if (--startedScreens != 0) return
-
-        soundPool?.release()
-        soundPool = null
-        sampleIds.clear()
-        loadedSamples.clear()
-        pendingEffects.clear()
-        streams.clear()
-        lastPlayed.clear()
+        if (--startedScreens <= 0) {
+            startedScreens = 0
+            pendingEffects.clear()
+            streams.clear()
+        }
     }
 
     fun play(sound: GameSound) {
-        val pool = soundPool ?: return
         val effect = GameAudioConfig.effects.getValue(sound)
         val sampleId = sampleIds[effect.resource] ?: return
         if (sampleId !in loadedSamples) {
@@ -142,9 +141,10 @@ internal class GameAudioManager private constructor(private val context: Context
         val previous = lastPlayed[sound]
         if (previous != null && now - previous < effect.cooldownMs) return
 
-        streams.remove(sound)?.let { pool.stop(it) }
         val volume = (GameAudioConfig.EFFECT_VOLUME * effect.volume * effectLevel / MAX_LEVEL).coerceIn(0f, 1f)
-        val stream = pool.play(sampleId, volume, volume, effect.priority, 0, 1f)
+        if (volume <= 0f) return
+
+        val stream = soundPool.play(sampleId, volume, volume, effect.priority, 0, 1f)
         if (stream != 0) {
             streams[sound] = stream
             lastPlayed[sound] = now
@@ -152,19 +152,22 @@ internal class GameAudioManager private constructor(private val context: Context
     }
 
     fun resumeBattleMusic(owner: Any, @RawRes resource: Int) {
-        if (musicOwner !== owner) releaseMusic()
+        if (musicOwner !== owner || currentMusicResource != resource) {
+            releaseMusic()
+        }
         musicOwner = owner
+        currentMusicResource = resource
         musicRequested = true
 
         music?.let {
-            if (musicPrepared) it.start()
+            if (musicPrepared && !it.isPlaying) it.start()
             return
         }
 
         val player = MediaPlayer()
         music = player
         try {
-            player.setAudioAttributes(attributes)
+            player.setAudioAttributes(musicAttributes)
             context.resources.openRawResourceFd(resource).use { asset ->
                 player.setDataSource(asset.fileDescriptor, asset.startOffset, asset.length)
             }
@@ -174,7 +177,7 @@ internal class GameAudioManager private constructor(private val context: Context
                     prepared.isLooping = true
                     val volume = musicVolume()
                     prepared.setVolume(volume, volume)
-                    if (musicRequested) prepared.start()
+                    if (musicRequested && !prepared.isPlaying) prepared.start()
                 }
             }
             player.setOnErrorListener { failed, what, extra ->
@@ -205,6 +208,7 @@ internal class GameAudioManager private constructor(private val context: Context
         music?.release()
         music = null
         musicOwner = null
+        currentMusicResource = null
         musicPrepared = false
         musicRequested = false
     }
