@@ -4,10 +4,13 @@ import android.content.Context
 import android.util.Log
 import android.view.ViewGroup
 import android.widget.ImageView
+import androidx.annotation.DrawableRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import kotlin.math.sqrt
 
-class RewardManagement {
+class RewardManagement(
+    @param:DrawableRes private val rewardDrawable: Int = R.drawable.rewardjewel
+) {
     lateinit var container : ViewGroup
 
     lateinit var context : Context
@@ -21,7 +24,7 @@ class RewardManagement {
         val radius = 22.5f
 
         rewardView.layoutParams = ConstraintLayout.LayoutParams(rewardSizepx, rewardSizepx )
-        rewardView.setImageResource(R.drawable.rewardjewel)
+        rewardView.setImageResource(rewardDrawable)
 
         container.addView(rewardView)
 

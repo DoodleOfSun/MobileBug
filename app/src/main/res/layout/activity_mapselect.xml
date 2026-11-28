@@ -6,14 +6,14 @@
     <HorizontalScrollView xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#FFFFFF"
+        android:background="@drawable/map_select_background"
         android:fillViewport="true">
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:orientation="horizontal"
-            android:gravity="center_vertical"
+            android:gravity="center"
             android:padding="16dp">
 
             <!-- 맵 1 -->
@@ -28,7 +28,7 @@
                     android:id="@+id/btn_map1"
                     android:layout_width="220dp"
                     android:layout_height="140dp"
-                    android:src="@drawable/panel_grey_dark"
+                    android:src="@drawable/map_select_thumbnail_1"
                     android:scaleType="centerCrop"
                     android:background="?attr/selectableItemBackground"
                     android:contentDescription="맵 1"/>
@@ -37,6 +37,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="맵1"
+                    android:textColor="#26384A"
                     android:textSize="18sp"
                     android:layout_marginTop="8dp" />
             </LinearLayout>
@@ -46,14 +47,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:gravity="center"
-                android:layout_marginEnd="32dp">
+                android:gravity="center">
 
                 <ImageButton
                     android:id="@+id/btn_map2"
                     android:layout_width="220dp"
                     android:layout_height="140dp"
-                    android:src="@drawable/panel_grey_dark"
+                    android:src="@drawable/map_select_thumbnail_2"
                     android:scaleType="centerCrop"
                     android:background="?attr/selectableItemBackground"
                     android:contentDescription="맵 2"/>
@@ -62,6 +62,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="맵2"
+                    android:textColor="#26384A"
                     android:textSize="18sp"
                     android:layout_marginTop="8dp" />
             </LinearLayout>

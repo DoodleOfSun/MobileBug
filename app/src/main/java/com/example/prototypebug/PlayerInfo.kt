@@ -9,7 +9,9 @@ import android.view.Window
 import android.widget.ImageButton
 import android.widget.TextView
 
-class PlayerInfo {
+class PlayerInfo internal constructor(private val playSound: (GameSound) -> Unit) {
+    constructor() : this({})
+
     var x = 0f
     var y = 0f
 
@@ -20,6 +22,12 @@ class PlayerInfo {
     lateinit var playerSprite: View
 
     var playerExp : Float = 0f
+
+    // 수정: 레벨업 횟수 (게임 시작 시 0). 몬스터 체력 계산에 씀
+    var playerLevel = 0
+
+    // 수정: 다음 레벨업까지 필요한 경험치. 레벨마다 GameBalance 에서 다시 계산
+    var playerExpScale = GameBalance.expToNextLevel(0)
 
     fun playerReset(){
         x = 0f
@@ -72,12 +80,33 @@ class PlayerInfo {
         }
     }
 
+    // 수정: 한 프레임에 보석을 여러 개 먹어 레벨업이 연달아 일어나면 선택창이 겹쳐 뜨고,
+    // 앞 창을 닫는 순간 뒤 창이 열려 있는데도 게임이 재개되던 문제 → 대기열로 하나씩 띄운다.
+    private var pendingLevelUps = 0
+    private var isLevelUpDialogShowing = false
+
     fun playerGetExp(exp: Float, cont: Context) {
         playerExp += exp
-        if (playerExp >= 1f) {
-            playerExp = 0f
+        if (exp > 0f) {playSound(GameSound.EXP_PICKUP)}
+        // 수정: 넘친 경험치를 버리지 않고 이월
+        // (0.01 을 30번 더해도 float 오차로 0.2999.. 가 될 수 있어 작은 여유값을 둠)
+        while (playerExp >= playerExpScale - 0.0001f) {
+            playerExp -= playerExpScale
+            playerLevel++
+            playerExpScale = GameBalance.expToNextLevel(playerLevel)
+            pendingLevelUps++
+        }
+        showNextLevelUp(cont)
+    }
 
-            if (cont is Map1Activity) {
+    private fun showNextLevelUp(cont: Context) {
+        if (isLevelUpDialogShowing || pendingLevelUps <= 0) return
+        pendingLevelUps--
+        run {
+            playSound(GameSound.LEVEL_UP)
+
+            if (cont is BaseGameActivity) {
+                isLevelUpDialogShowing = true
                 cont.setPause(true)
 
                 val levelupXML = cont.layoutInflater.inflate(R.layout.level_up_settings, null)
@@ -91,7 +120,6 @@ class PlayerInfo {
                 )
                 dialog.setCancelable(false)
 
-                // 3개 랜덤 선택
                 val choices = cont.weaponManager.getRandomChoices(3)
 
                 val text1 = levelupXML.findViewById<TextView>(R.id.text_choose1)
@@ -111,22 +139,16 @@ class PlayerInfo {
                 text3.text = choices[2].name
                 btn3.setImageResource(choices[2].iconRes)
 
-                // 선택 처리
-                btn1.setOnClickListener {
-                    cont.weaponManager.addOrLevelUp(choices[0])
-                    cont.setPause(false)
+                // 선택 처리: 대기 중인 레벨업이 남아 있으면 일시정지를 유지한 채 다음 창을 띄운다
+                fun choose(index: Int) {
+                    cont.weaponManager.addOrLevelUp(choices[index])
                     dialog.dismiss()
+                    isLevelUpDialogShowing = false
+                    if (pendingLevelUps > 0) showNextLevelUp(cont) else cont.setPause(false)
                 }
-                btn2.setOnClickListener {
-                    cont.weaponManager.addOrLevelUp(choices[1])
-                    cont.setPause(false)
-                    dialog.dismiss()
-                }
-                btn3.setOnClickListener {
-                    cont.weaponManager.addOrLevelUp(choices[2])
-                    cont.setPause(false)
-                    dialog.dismiss()
-                }
+                btn1.setGameClickListener(playSound) { choose(0) }
+                btn2.setGameClickListener(playSound) { choose(1) }
+                btn3.setGameClickListener(playSound) { choose(2) }
 
                 dialog.show()
 

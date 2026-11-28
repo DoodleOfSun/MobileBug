@@ -12,13 +12,15 @@ import android.hardware.SensorManager
 import android.os.Bundle
 import android.util.Log
 import android.view.MotionEvent
+import android.view.Surface
 import android.view.View
 import android.view.Window
+import android.view.WindowManager
 import android.widget.ImageButton
 import android.widget.SeekBar
-import androidx.appcompat.app.AppCompatActivity
+import kotlin.math.atan2
 
-class TitleActivity : AppCompatActivity(), SensorEventListener {
+class TitleActivity : AudioActivity(), SensorEventListener {
 
     private lateinit var sensorManager: SensorManager
     private var accelerometer: Sensor? = null
@@ -47,6 +49,7 @@ class TitleActivity : AppCompatActivity(), SensorEventListener {
         // 화면 터치 → 맵 선택으로
         findViewById<View>(R.id.mainContainer).setOnTouchListener { _, event ->
             if (event.action == MotionEvent.ACTION_DOWN) {
+                playSound(GameSound.BUTTON_CLICK)
                 startActivity(Intent(this, MapSelectActivity::class.java))
             }
             true
@@ -54,7 +57,7 @@ class TitleActivity : AppCompatActivity(), SensorEventListener {
 
         // 설정 버튼
         val settingsButton = findViewById<ImageButton>(R.id.btn_settings)
-        settingsButton.setOnClickListener {
+        settingsButton.setGameClickListener(::playSound) {
             isPaused = true
             val settingsXML = layoutInflater.inflate(R.layout.settings, null)
             val btnClose = settingsXML.findViewById<ImageButton>(R.id.btnSettingClose)
@@ -65,15 +68,27 @@ class TitleActivity : AppCompatActivity(), SensorEventListener {
             dialog.setContentView(settingsXML)
             dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
             dialog.window?.setLayout(dpToPx(550f), dpToPx(330f))
+            // 카메라 구멍 영역까지 화면 전체 기준으로 가운데 정렬 (시작화면과 같은 기준)
+            dialog.window?.let { window ->
+                window.attributes = window.attributes.apply {
+                    layoutInDisplayCutoutMode =
+                        WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALWAYS
+                }
+            }
 
             seekBar.progress = sensitivity.toInt()
+            setupVolumeBars(settingsXML)
 
-            btnClose.setOnClickListener {
+            btnClose.setGameClickListener(::playSound) {
                 isPaused = false
                 sensitivity = seekBar.progress.toFloat()
                 prefs.edit().putFloat("sensitivity", sensitivity).apply()
                 Log.d("GameDebug", "민감도 저장: $sensitivity")
                 dialog.dismiss()
+            }
+
+            dialog.setOnDismissListener {
+                isPaused = false
             }
 
             dialog.show()
@@ -94,19 +109,26 @@ class TitleActivity : AppCompatActivity(), SensorEventListener {
 
     override fun onSensorChanged(event: SensorEvent?) {
         if (isPaused) return
-
         if (event == null || event.sensor.type != Sensor.TYPE_ACCELEROMETER) return
 
-        val tiltX = event.values[1]
-        val tiltY = -event.values[0]
+        @Suppress("DEPRECATION")
+        val rotation = windowManager.defaultDisplay.rotation
+        val rawX = event.values[0]
+        val rawY = event.values[1]
 
-        velX += tiltX * sensitivity * 0.05f
-        velY += tiltY * sensitivity * 0.05f
+        val (mappedX, mappedY) = when (rotation) {
+            Surface.ROTATION_90 -> rawY to -rawX
+            Surface.ROTATION_270 -> -rawY to rawX
+            else -> rawX to rawY
+        }
+
+        velX += mappedX * sensitivity * 0.05f
+        velY += -mappedY * sensitivity * 0.05f
         velX *= damping
         velY *= damping
 
         playerSprite.x += velX
-        playerSprite.y -= velY
+        playerSprite.y += velY
 
         val container = findViewById<View>(R.id.mainContainer)
         val maxX = (container.width - playerSprite.width).coerceAtLeast(0).toFloat()
@@ -114,6 +136,11 @@ class TitleActivity : AppCompatActivity(), SensorEventListener {
 
         playerSprite.x = playerSprite.x.coerceIn(0f, maxX)
         playerSprite.y = playerSprite.y.coerceIn(0f, maxY)
+
+        val speedSq = velX * velX + velY * velY
+        if (speedSq > 0.01f) {
+            playerSprite.rotation = Math.toDegrees(atan2(velY.toDouble(), velX.toDouble())).toFloat()
+        }
     }
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="120dp"
+    android:height="120dp"
+    android:viewportWidth="64"
+    android:viewportHeight="64">
+    <path
+        android:fillColor="@color/map1_boss_hull"
+        android:strokeColor="@color/map1_boss_edge"
+        android:strokeWidth="2.5"
+        android:strokeLineJoin="round"
+        android:pathData="M32,2 L42,11 L52,9 L54,21 L62,32 L54,43 L52,55 L42,53 L32,62 L22,53 L12,55 L10,43 L2,32 L10,21 L12,9 L22,11 Z" />
+    <path
+        android:fillColor="@color/map1_boss_panel"
+        android:pathData="M32,11 L45,20 L51,32 L45,44 L32,53 L19,44 L13,32 L19,20 Z" />
+    <path
+        android:fillColor="@color/map1_boss_hull"
+        android:pathData="M32,21 L45,33 L32,44 L19,33 Z" />
+    <path
+        android:fillColor="@color/map1_boss_edge"
+        android:pathData="M11,26 L17,32 L11,38 L7,32 Z M53,26 L57,32 L53,38 L47,32 Z M28,11 L32,7 L36,11 L32,15 Z M28,53 L32,49 L36,53 L32,57 Z" />
+    <path
+        android:fillColor="@color/map1_boss_core"
+        android:pathData="M32,26 L40,33 L32,39 L24,33 Z" />
+</vector>

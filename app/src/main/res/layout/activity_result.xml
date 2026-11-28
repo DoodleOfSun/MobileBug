@@ -1,54 +1,126 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- 결과 화면 (settings.xml 과 같은 군사 테마). 코드에서 쓰는 id: text_clear, text_score, btn_restart, btn_mapselect -->
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#2B3024">
 
+    <!-- 테두리 패널 (settings.xml 과 동일, 그림 비율 872:592 유지) -->
+    <ImageView
+        android:id="@+id/resultPanel"
+        android:layout_width="0dp"
+        android:layout_height="300dp"
+        android:importantForAccessibility="no"
+        android:scaleType="fitXY"
+        android:src="@drawable/settings_panel"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintDimensionRatio="872:592"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- 제목 뒤 비스듬한 띠 -->
+    <ImageView
+        android:id="@+id/resultTitleBand"
+        android:layout_width="wrap_content"
+        android:layout_height="30dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="18dp"
+        android:adjustViewBounds="true"
+        android:importantForAccessibility="no"
+        android:src="@drawable/settings_title_band"
+        app:layout_constraintStart_toStartOf="@id/resultPanel"
+        app:layout_constraintTop_toTopOf="@id/resultPanel" />
+
+    <!-- 노란 빗금 장식 -->
+    <ImageView
+        android:id="@+id/resultStripes"
+        android:layout_width="wrap_content"
+        android:layout_height="18dp"
+        android:layout_marginStart="12dp"
+        android:adjustViewBounds="true"
+        android:importantForAccessibility="no"
+        android:src="@drawable/settings_stripes"
+        app:layout_constraintBottom_toBottomOf="@id/resultTitleBand"
+        app:layout_constraintStart_toStartOf="@id/resultTitleBand"
+        app:layout_constraintTop_toTopOf="@id/resultTitleBand" />
+
+    <!-- 결과 글자 (코드에서 DIED 등으로 바꿈) -->
     <TextView
         android:id="@+id/text_clear"
-        android:layout_width="387dp"
-        android:layout_height="94dp"
-        android:text="nailed it"
-        android:gravity="center"
-        android:textSize="60dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
         android:fontFamily="@font/youre_gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.499"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.186" />
+        android:gravity="center"
+        android:includeFontPadding="false"
+        android:shadowColor="#3C4232"
+        android:shadowDx="0"
+        android:shadowDy="3"
+        android:shadowRadius="4"
+        android:text="nailed it"
+        android:textColor="#E3D5B5"
+        android:textSize="48sp"
+        app:layout_constraintEnd_toEndOf="@id/resultPanel"
+        app:layout_constraintStart_toStartOf="@id/resultPanel"
+        app:layout_constraintTop_toBottomOf="@id/resultTitleBand" />
 
+    <!-- 점수 (설정창 슬라이더와 같은 주황 계열로 강조) -->
     <TextView
         android:id="@+id/text_score"
-        android:layout_width="387dp"
-        android:layout_height="94dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="14dp"
         android:fontFamily="@font/youre_gone"
         android:gravity="center"
+        android:includeFontPadding="false"
+        android:shadowColor="#3C4232"
+        android:shadowDx="0"
+        android:shadowDy="2"
+        android:shadowRadius="3"
         android:text="yourscore"
-        android:textSize="40dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.536" />
+        android:textColor="#F0643A"
+        android:textSize="28sp"
+        app:layout_constraintEnd_toEndOf="@id/resultPanel"
+        app:layout_constraintStart_toStartOf="@id/resultPanel"
+        app:layout_constraintTop_toBottomOf="@id/text_clear" />
 
+    <!-- 구분선 -->
+    <ImageView
+        android:id="@+id/resultDivider"
+        android:layout_width="0dp"
+        android:layout_height="4dp"
+        android:layout_marginStart="28dp"
+        android:layout_marginTop="18dp"
+        android:layout_marginEnd="28dp"
+        android:importantForAccessibility="no"
+        android:scaleType="fitXY"
+        android:src="@drawable/settings_divider"
+        app:layout_constraintEnd_toEndOf="@id/resultPanel"
+        app:layout_constraintStart_toStartOf="@id/resultPanel"
+        app:layout_constraintTop_toBottomOf="@id/text_score" />
+
+    <!-- 버튼 2개 -->
     <Button
         android:id="@+id/btn_restart"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
         android:background="@android:color/transparent"
         android:fontFamily="@font/youre_gone"
+        android:shadowColor="#3C4232"
+        android:shadowDx="0"
+        android:shadowDy="2"
+        android:shadowRadius="3"
         android:text="RESTART"
-        android:textColor="@color/black"
-        android:textSize="30dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.277"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.842" />
+        android:textColor="#E3D5B5"
+        android:textSize="22sp"
+        app:layout_constraintEnd_toStartOf="@id/btn_mapselect"
+        app:layout_constraintHorizontal_chainStyle="spread"
+        app:layout_constraintStart_toStartOf="@id/resultPanel"
+        app:layout_constraintTop_toBottomOf="@id/resultDivider" />
 
     <Button
         android:id="@+id/btn_mapselect"
@@ -56,15 +128,15 @@
         android:layout_height="wrap_content"
         android:background="@android:color/transparent"
         android:fontFamily="@font/youre_gone"
+        android:shadowColor="#3C4232"
+        android:shadowDx="0"
+        android:shadowDy="2"
+        android:shadowRadius="3"
         android:text="map select"
-        android:textColor="@color/black"
-        android:textSize="30dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.722"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.842" />
-
+        android:textColor="#E3D5B5"
+        android:textSize="22sp"
+        app:layout_constraintBaseline_toBaselineOf="@id/btn_restart"
+        app:layout_constraintEnd_toEndOf="@id/resultPanel"
+        app:layout_constraintStart_toEndOf="@id/btn_restart" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

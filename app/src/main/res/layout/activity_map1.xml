@@ -5,13 +5,13 @@
     android:id="@+id/mainContainer"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFF">
+    android:background="@drawable/map1_arena">
 
     <View
         android:id="@+id/square"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:background="#000000"
+        android:background="@drawable/map1_soldier"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.499"
@@ -19,6 +19,25 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.498" />
 
+
+    <!-- 남은 시간 (BaseGameActivity 가 매초 갱신) -->
+    <TextView
+        android:id="@+id/timerText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:fontFamily="@font/youre_gone"
+        android:includeFontPadding="false"
+        android:shadowColor="#000000"
+        android:shadowDx="0"
+        android:shadowDy="2"
+        android:shadowRadius="4"
+        android:text="5:00"
+        android:textColor="#FFFFFF"
+        android:textSize="28sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ImageButton
         android:id="@+id/btn_settings"
@@ -30,6 +49,7 @@
         android:contentDescription="@string/optionbutton"
         android:scaleType="fitCenter"
         android:src="@drawable/gear"
+        app:tint="#FFFFFF"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -60,7 +80,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.692"
-        app:srcCompat="@drawable/playernormalattack" />
+        app:srcCompat="@drawable/map1_normal_attack_orb" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
